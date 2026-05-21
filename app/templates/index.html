@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>心海 · 首页</title>
+    <link rel="icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="/static/css/all.min.css"/>
+    <style>
+      /* ===== 全局重置 ===== */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #f9f9f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "PingFang SC", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        position: relative; /* 为绝对定位按钮提供参考 */
+      }
+
+      /* ===== 原有加载动画样式===== */
+      .loader {
+        width: fit-content;
+        height: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .wrapper {
+        width: fit-content;
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .catContainer {
+        width: 100%;
+        height: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .catbody {
+        width: 80px;
+      }
+      .tail {
+        position: absolute;
+        width: 17px;
+        top: 50%;
+        animation: tail 0.5s ease-in infinite alternate-reverse;
+        transform-origin: top;
+      }
+      @keyframes tail {
+        0% {
+          transform: rotateZ(60deg);
+        }
+        50% {
+          transform: rotateZ(0deg);
+        }
+        100% {
+          transform: rotateZ(-20deg);
+        }
+      }
+      .wall {
+        width: 300px;
+        margin-top: 20px;
+      }
+      .text {
+        display: flex;
+        flex-direction: column;
+        width: 50px;
+        position: absolute;
+        margin: 0 0 100px 120px;
+      }
+      .zzz {
+        color: black;
+        font-weight: 700;
+        font-size: 15px;
+        animation: zzz 2s linear infinite;
+      }
+      .bigzzz {
+        color: black;
+        font-weight: 700;
+        font-size: 25px;
+        margin-left: 10px;
+        animation: zzz 2.3s linear infinite;
+      }
+      @keyframes zzz {
+        0% {
+          color: transparent;
+        }
+        50% {
+          color: black;
+        }
+        100% {
+          color: transparent;
+        }
+      }
+
+      /* ===== 动态计时器样式===== */
+      .container {
+          height: 140px;
+          position: relative;
+          text-align: center;
+          display: flex;
+          gap: 20px;
+          margin-top: 40px;
+          width: fit-content;
+          margin-left: auto;
+          margin-right: auto;
+      }
+      .nums {
+        opacity: 0.85;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        border-top: 1px solid #393939;
+        display: inline-block;
+        height: 140px;
+        perspective: 1000px;
+        position: relative;
+        width: 98px;
+      }
+      .nums:before {
+        border-bottom: 2px solid black;
+        content: "";
+        height: 1px;
+        left: 0;
+        position: absolute;
+        transform: translate3d(0, -1px, 0);
+        top: 50%;
+        width: 100%;
+        z-index: 1000;
+      }
+      .nums:after {
+        backface-visibility: hidden;
+        background: #2a2a2a;
+        border-bottom: 1px solid #444444;
+        border-top: 1px solid black;
+        border-radius: 0 0 5px 5px;
+        bottom: 0;
+        box-shadow: inset 0 15px 50px #202020;
+        color: #ccc;
+        content: "0";
+        display: block;
+        font-size: 100px;
+        height: calc(50% - 1px);
+        left: 0;
+        line-height: 0;
+        overflow: hidden;
+        position: absolute;
+        text-align: center;
+        text-shadow: 0 1px 2px #333;
+        width: 100%;
+        z-index: 0;
+      }
+      .num {
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in;
+        border-radius: 5px;
+        font-size: 100px;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        transform: rotateX(0);
+        transition: 0.6s;
+        transform-style: preserve-3d;
+        top: 0;
+        width: 100%;
+      }
+      .num:before,
+      .num:after {
+        backface-visibility: hidden;
+        color: #eeeeee;
+        display: block;
+        height: 50%;
+        left: 0;
+        overflow: hidden;
+        position: absolute;
+        text-align: center;
+        text-shadow: 0 1px 2px #333;
+        width: 100%;
+      }
+      .num:before {
+        background: #181818;
+        border-radius: 5px 5px 0 0;
+        box-shadow: inset 0 15px 50px #111111;
+        content: attr(data-num);
+        line-height: 1.38;
+        top: 0;
+        z-index: 1;
+      }
+      .num:after {
+        background: #2a2a2a;
+        border-bottom: 1px solid #444444;
+        border-radius: 0 0 5px 5px;
+        box-shadow: inset 0 15px 50px #202020;
+        content: attr(data-num-next);
+        height: calc(50% - 1px);
+        line-height: 0;
+        top: 0;
+        transform: rotateX(180deg);
+      }
+      .nums-one .num:nth-of-type(1) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 0s;
+        z-index: 10;
+      }
+      .nums-one .num:nth-of-type(2) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 1s;
+        z-index: 9;
+      }
+      .nums-one .num:nth-of-type(3) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 2s;
+        z-index: 8;
+      }
+      .nums-one .num:nth-of-type(4) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 3s;
+        z-index: 7;
+      }
+      .nums-one .num:nth-of-type(5) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 4s;
+        z-index: 6;
+      }
+      .nums-one .num:nth-of-type(6) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 5s;
+        z-index: 5;
+      }
+      .nums-one .num:nth-of-type(7) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 6s;
+        z-index: 4;
+      }
+      .nums-one .num:nth-of-type(8) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 7s;
+        z-index: 3;
+      }
+      .nums-one .num:nth-of-type(9) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 8s;
+        z-index: 2;
+      }
+      .nums-one .num:nth-of-type(10) {
+        animation: num-one 10s infinite ease-in;
+        animation-delay: 9s;
+        z-index: 1;
+      }
+      .nums-ten .num:nth-of-type(1) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 9s;
+        z-index: 10;
+      }
+      .nums-ten .num:nth-of-type(2) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 19s;
+        z-index: 9;
+      }
+      .nums-ten .num:nth-of-type(3) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 29s;
+        z-index: 8;
+      }
+      .nums-ten .num:nth-of-type(4) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 39s;
+        z-index: 7;
+      }
+      .nums-ten .num:nth-of-type(5) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 49s;
+        z-index: 6;
+      }
+      .nums-ten .num:nth-of-type(6) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 59s;
+        z-index: 5;
+      }
+      .nums-ten .num:nth-of-type(7) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 69s;
+        z-index: 4;
+      }
+      .nums-ten .num:nth-of-type(8) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 79s;
+        z-index: 3;
+      }
+      .nums-ten .num:nth-of-type(9) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 89s;
+        z-index: 2;
+      }
+      .nums-ten .num:nth-of-type(10) {
+        animation: num-ten 100s infinite ease-in;
+        animation-delay: 99s;
+        z-index: 1;
+      }
+      @keyframes num-one {
+        0% {
+          transform: rotateX(0);
+          z-index: 50;
+        }
+        10% {
+          transform: rotateX(-180deg);
+          z-index: 50;
+        }
+        90% {
+          transform: rotateX(-180deg);
+          z-index: 1;
+        }
+        90.0001% {
+          transform: rotateX(0);
+        }
+        100% {
+          transform: rotateX(0);
+        }
+      }
+      @keyframes num-ten {
+        0% {
+          transform: rotateX(0);
+          z-index: 50;
+        }
+        1% {
+          transform: rotateX(-180deg);
+          z-index: 50;
+        }
+        90% {
+          transform: rotateX(-180deg);
+          z-index: 1;
+        }
+        90.0001% {
+          transform: rotateX(0);
+        }
+        100% {
+          transform: rotateX(0);
+        }
+      }
+      .nums-hun .num:nth-of-type(1) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 99s;
+        z-index: 10;
+      }
+      .nums-hun .num:nth-of-type(2) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 199s;
+        z-index: 9;
+      }
+      .nums-hun .num:nth-of-type(3) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 299s;
+        z-index: 8;
+      }
+      .nums-hun .num:nth-of-type(4) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 399s;
+        z-index: 7;
+      }
+      .nums-hun .num:nth-of-type(5) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 499s;
+        z-index: 6;
+      }
+      .nums-hun .num:nth-of-type(6) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 599s;
+        z-index: 5;
+      }
+      .nums-hun .num:nth-of-type(7) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 699s;
+        z-index: 4;
+      }
+      .nums-hun .num:nth-of-type(8) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 799s;
+        z-index: 3;
+      }
+      .nums-hun .num:nth-of-type(9) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 899s;
+        z-index: 2;
+      }
+      .nums-hun .num:nth-of-type(10) {
+        animation: num-hun 1000s infinite ease-in;
+        animation-delay: 999s;
+        z-index: 1;
+      }
+      @keyframes num-hun {
+        0% {
+          transform: rotateX(0);
+          z-index: 50;
+        }
+        0.1% {
+          /* 注意：这里时间极短，因为1000秒才翻一次 */
+          transform: rotateX(-180deg);
+          z-index: 50;
+        }
+        90% {
+          transform: rotateX(-180deg);
+          z-index: 1;
+        }
+        90.0001% {
+          transform: rotateX(0);
+        }
+        100% {
+          transform: rotateX(0);
+        }
+      }
+
+      /* ===== 心海哲思语录卡片 ===== */
+      .card {
+        width: 320px;
+        height: 350px;
+        border-radius: 4px;
+        display: flex;
+        gap: 5px;
+        padding: 0.4em;
+        background: rgba(90, 90, 90, 0.7);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        border: 2px solid rgba(100, 95, 100, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+      }
+      .card p {
+        height: 100%;
+        flex: 1;
+        overflow: hidden;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        background: transparent;
+        border: 2px solid rgba(95, 227, 221, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .card p:hover {
+        flex: 4;
+        border-color: rgba(234, 107, 218, 0.5);
+        transform: scale(1.02);
+      }
+      .card p span {
+        padding: 0.5em;
+        text-align: center;
+        transform: rotate(-90deg);
+        transition: all 0.5s;
+        text-transform: uppercase;
+        color: white;
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+        font-weight: bold;
+      }
+      .card p:hover span {
+        transform: rotate(0);
+        color: #ffc44d;
+      }
+
+      /* ===== 网格 ===== */
+      .xh-interactive-card {
+        position: relative;
+        height: 280px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        background-blend-mode: overlay;
+      }
+      .xh-interactive-card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+      }
+      .xh-card-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        box-sizing: border-box;
+        background-color: #fff;
+        opacity: 0;
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      .xh-interactive-card:hover .xh-card-content {
+        transform: translate(-50%, -50%) rotate(0deg);
+        opacity: 1;
+      }
+      .xh-card-title {
+        margin: 0;
+        font-size: 22px;
+        color: #333;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+      .xh-card-desc {
+        margin: 12px 0 0;
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      .xh-cards-grid {
+          display: grid !important;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+          gap: 12px !important;
+          width: 100%;
+      }
+
+      /* 左下角统一面板内的子元素布局 */
+      #minimized-hints,
+      #task-notifications {
+          display: flex;
+          flex-direction: column-reverse;
+          gap: 4px;
+          max-width: 100%;
+      }
+      .minimized-hint-item {
+          background: rgba(30, 30, 30, 0.85);
+          color: #e0e0e0;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 12px;
+          line-height: 1.3;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          max-width: 100%;
+      }
+      .minimized-hint-item:hover {
+          background: rgba(50, 50, 50, 0.95);
+          color: #fff;
+      }
+    </style>
+    <!-- Tailwind CSS CDN（带配置） -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 必须在 tailwind CDN 加载后立即执行，但放在此处是安全的
+        // 实际上 CDN 脚本会检测已有的 tailwind.config 对象
+        window.tailwind = window.tailwind || {};
+        tailwind.config = {
+            corePlugins: {
+                preflight: false  // 禁用重置，避免覆盖原有样式
+            }
+        };
+    </script>
+
+  </head>
+  <body x-data>
+    <div id="global-header" style="margin-bottom: 100px"></div>
+
+    <div class="hero-section" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 0 20px; box-sizing: border-box;">
+      <!-- 原有加载动画 -->
+      <div class="loader">
+        <div class="wrapper">
+          <div class="catContainer">
+            <!-- 左侧语录 -->
+            <div class="card" style="position: absolute; left: -430px; top: 0">
+              <p><span>一念既起，万相随生</span></p>
+              <p><span>静水藏渊，微澜示警</span></p>
+              <p><span>观海不溺，入海不迷</span></p>
+            </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 733 673"
+              class="catbody"
+            >
+              <path
+                fill="#212121"
+                d="M111.002 139.5C270.502 -24.5001 471.503 2.4997 621.002 139.5C770.501 276.5 768.504 627.5 621.002 649.5C473.5 671.5 246 687.5 111.002 649.5C-23.9964 611.5 -48.4982 303.5 111.002 139.5Z"
+              ></path>
+              <path fill="#212121" d="M184 9L270.603 159H97.3975L184 9Z"></path>
+              <path fill="#212121" d="M541 0L627.603 150H454.397L541 0Z"></path>
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 158 564"
+              class="tail"
+            >
+              <path
+                fill="#191919"
+                d="M5.97602 76.066C-11.1099 41.6747 12.9018 0 51.3036 0V0C71.5336 0 89.8636 12.2558 97.2565 31.0866C173.697 225.792 180.478 345.852 97.0691 536.666C89.7636 553.378 73.0672 564 54.8273 564V564C16.9427 564 -5.4224 521.149 13.0712 488.085C90.2225 350.15 87.9612 241.089 5.97602 76.066Z"
+              ></path>
+            </svg>
+
+            <!-- 右侧语录 -->
+            <div class="card" style="position: absolute; right: -430px; top: 0">
+              <p><span>见深即深，遇浅成浅</span></p>
+              <p><span>身在樊笼，心游太虚</span></p>
+              <p><span>潮来不拒，潮去不留</span></p>
+            </div>
+            <div class="text">
+              <span class="bigzzz">Z</span>
+              <span class="zzz">Z</span>
+            </div>
+          </div>
+          <div class="wallContainer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 500 126"
+              class="wall"
+            >
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="3"
+                x2="450"
+                y1="3"
+                x1="50"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="85"
+                x2="400"
+                y1="85"
+                x1="100"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="122"
+                x2="375"
+                y1="122"
+                x1="125"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="43"
+                x2="500"
+                y1="43"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="1.99391"
+                x2="115.5"
+                y1="43.0061"
+                x1="115.5"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="2.00002"
+                x2="189"
+                y1="43.0122"
+                x1="189"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="2.00612"
+                x2="262.5"
+                y1="43.0183"
+                x1="262.5"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="2.01222"
+                x2="336"
+                y1="43.0244"
+                x1="336"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="2.01833"
+                x2="409.5"
+                y1="43.0305"
+                x1="409.5"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="43"
+                x2="153"
+                y1="84.0122"
+                x1="153"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="43"
+                x2="228"
+                y1="84.0122"
+                x1="228"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="43"
+                x2="303"
+                y1="84.0122"
+                x1="303"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="43"
+                x2="378"
+                y1="84.0122"
+                x1="378"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="84"
+                x2="192"
+                y1="125.012"
+                x1="192"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="84"
+                x2="267"
+                y1="125.012"
+                x1="267"
+              ></line>
+              <line
+                stroke-width="6"
+                stroke="#7C7C7C"
+                y2="84"
+                x2="342"
+                y1="125.012"
+                x1="342"
+              ></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 计时器区域（居中） -->
+      <div class="container" style="margin-left: auto; margin-right: auto; justify-content: center;">
+    <!-- 百位 -->
+    <div class="nums nums-hun">
+        <div class="num" data-num="0" data-num-next="1"></div>
+        <div class="num" data-num="1" data-num-next="2"></div>
+        <div class="num" data-num="2" data-num-next="3"></div>
+        <div class="num" data-num="3" data-num-next="4"></div>
+        <div class="num" data-num="4" data-num-next="5"></div>
+        <div class="num" data-num="5" data-num-next="6"></div>
+        <div class="num" data-num="6" data-num-next="7"></div>
+        <div class="num" data-num="7" data-num-next="8"></div>
+        <div class="num" data-num="8" data-num-next="9"></div>
+        <div class="num" data-num="9" data-num-next="0"></div>
+    </div>
+    <!-- 十位 -->
+    <div class="nums nums-ten">
+        <div class="num" data-num="0" data-num-next="1"></div>
+        <div class="num" data-num="1" data-num-next="2"></div>
+        <div class="num" data-num="2" data-num-next="3"></div>
+        <div class="num" data-num="3" data-num-next="4"></div>
+        <div class="num" data-num="4" data-num-next="5"></div>
+        <div class="num" data-num="5" data-num-next="6"></div>
+        <div class="num" data-num="6" data-num-next="7"></div>
+        <div class="num" data-num="7" data-num-next="8"></div>
+        <div class="num" data-num="8" data-num-next="9"></div>
+        <div class="num" data-num="9" data-num-next="0"></div>
+    </div>
+    <!-- 个位 -->
+    <div class="nums nums-one">
+        <div class="num" data-num="0" data-num-next="1"></div>
+        <div class="num" data-num="1" data-num-next="2"></div>
+        <div class="num" data-num="2" data-num-next="3"></div>
+        <div class="num" data-num="3" data-num-next="4"></div>
+        <div class="num" data-num="4" data-num-next="5"></div>
+        <div class="num" data-num="5" data-num-next="6"></div>
+        <div class="num" data-num="6" data-num-next="7"></div>
+        <div class="num" data-num="7" data-num-next="8"></div>
+        <div class="num" data-num="8" data-num-next="9"></div>
+        <div class="num" data-num="9" data-num-next="0"></div>
+    </div>
+</div>
+
+      <!-- ===== 心海 · 横幅 + 卡片网格 + 文章===== -->
+      <div
+        class="xh-section"
+        style="
+          width: 100%;
+          max-width: 1200px;
+          margin: 80px auto 60px;
+          padding: 0 20px;
+          box-sizing: border-box;
+        "
+      >
+        <!-- 横幅标题 -->
+        <div
+          class="xh-banner"
+          style="text-align: center; margin-bottom: 40px; position: relative"
+        >
+          <h2
+            style="
+              font-size: 28px;
+              font-weight: 700;
+              color: #333;
+              letter-spacing: 1px;
+              display: inline-block;
+              padding-bottom: 12px;
+            "
+          >
+            心海 · 探索
+          </h2>
+          <div
+            style="
+              position: absolute;
+              bottom: 0;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 60px;
+              height: 3px;
+              background: linear-gradient(to right, #f89b29, #ff0f7b);
+              border-radius: 2px;
+            "
+          ></div>
+        </div>
+
+        <!-- 网格卡片 -->
+        <div
+          class="xh-cards-grid"
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 12px;
+          "
+        >
+           <template x-for="card in $store.app.cards" :key="card.id">
+                <div class="xh-interactive-card" :style="`background-image: url('${card.image}')`">
+                    <div class="xh-card-content">
+                        <p class="xh-card-title" x-text="card.title"></p>
+                        <p class="xh-card-desc" x-text="card.desc"></p>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- 左下角统一容器 -->
+        <div id="left-bottom-panel" style="position: fixed; bottom: 12px; left: 12px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-start; max-width: 200px;">
+
+          <!-- 任务通知区（上方） -->
+          <div id="task-notifications" style="display: flex; flex-direction: column-reverse; gap: 4px; width: 100%; margin-bottom: 30px;">
+          </div>
+
+          <!-- 原有最小化弹窗区（下方） -->
+          <div id="minimized-hints" style="display: flex; flex-direction: column-reverse; gap: 4px; width: 100%;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 状态提示框 -->
+    <div id="statusBox" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 8px; color: white; font-size: 14px; z-index: 10000; display: none;"></div>
+
+    <div id="global-footer" style="margin-top: 50px"></div>
+
+    <script src="/static/js/axios.min.js" defer></script>
+    <script src="/static/js/header.js" defer></script>
+    <script src="/static/js/footer.js" defer></script>
+    <script src="/static/js/utils.js" defer></script>
+    <script src="/static/js/contextMenu.js" defer></script>
+    <script src="/static/js/scrollButtons.js" defer></script>
+    <script src="/static/js/iconify.min.js" defer></script>
+    <script src="/static/js/taskNotifications.js" defer></script>
+    <script src="/static/js/index.js" defer></script>
+    <script src="/static/js/alpine.min.js" defer></script>
+  </body>
+</html>

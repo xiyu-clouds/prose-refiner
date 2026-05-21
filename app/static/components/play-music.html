@@ -1,0 +1,509 @@
+<div class="music-player-container">
+      <!-- 主内容区 -->
+      <div class="main-content">
+        <div class="content-overlay">
+          <!-- 左侧：专辑信息 -->
+          <div class="track-info">
+          <div class="track-details">
+            <div class="track-title" id="trackTitle">未知歌曲</div>
+            <div class="artist-name" id="artistName">未知艺术家</div>
+          </div>
+        </div>
+
+          <!-- 右侧：歌词 -->
+          <div class="lyric-display" id="lyricDisplay">
+              <!-- 动态生成 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部控制栏（固定在底部） -->
+      <div class="playback-controls">
+        <div class="time-info">
+          <span class="current-time">0:00</span> / <span class="remaining-time">4:00</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+          <div class="progress-handle"></div>
+        </div>
+
+        <div class="button-row">
+          <div class="left-controls">
+            <button class="control-button" id="prevBtn" title="上一首">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.5 3.5A.5.5 0 0 0 0 4v8a.5.5 0 0 0 1 0V8.753l6.267 3.636c.54.313 1.233-.066 1.233-.697v-2.94l6.267 3.636c.54.314 1.233-.065 1.233-.696V4.308c0-.63-.693-1.01-1.233-.696L8.5 7.248v-2.94c0-.63-.692-1.01-1.233-.696L1 7.248V4a.5.5 0 0 0-.5-.5"></path>
+          </svg>
+        </button>
+
+            <button class="control-button play-pause" id="playPauseBtn" title="播放">
+          <svg class="icon-play" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M11.596 8.697l-6.363 3.692c-.54.314-1.233-.065-1.233-.696V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"></path>
+          </svg>
+          <svg class="icon-pause" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5"></path>
+          </svg>
+        </button>
+
+            <button class="control-button" id="nextBtn" title="下一首">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V8.753l-6.267 3.636c-.54.313-1.233-.066-1.233-.697v-2.94l-6.267 3.636C.693 12.703 0 12.324 0 11.693V4.308c0-.63.693-1.01 1.233-.696L7.5 7.248v-2.94c0-.63.693-1.01 1.233-.696L15 7.248V4a.5.5 0 0 1 .5-.5"></path>
+              </svg>
+            </button>
+
+            <!-- ✅ 音量控制（新增） -->
+            <div class="volume-control" id="volumeControl">
+              <button class="control-button volume-toggle" id="volumeToggleBtn" title="调节音量">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#fff">
+                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"></path>
+                </svg>
+              </button>
+              <div class="volume-slider-container hidden" id="volumeSliderContainer">
+                  <label for="volumeSlider"></label><input type="range" min="0" max="1" step="0.01" value="0.7" class="volume-slider" id="volumeSlider">
+                <span class="volume-value" id="volumeValue">70%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-controls">
+            <!-- 更换背景 -->
+            <button class="control-button change-bg-btn" id="changeBgBtn" title="更换背景">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
+                <path fill="#fff" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path>
+                <path fill="#fff" d="m12 6c-3.309 0-6 2.691-6 6s2.691 6 6 6 6-2.691 6-6-2.691-6-6-6zm0 10c-2.206 0-4-1.794-4-4s1.794-4 4-4 4 1.794 4 4-1.794 4-4 4z"></path>
+              </svg>
+            </button>
+
+            <!-- 播放模式切换按钮 -->
+            <button class="control-button" id="modeBtn" title="播放模式">
+              <span id="modeIcon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
+                  <path fill="#fff" d="M8 20v1.932a.5.5 0 0 1-.82.385l-4.12-3.433A.5.5 0 0 1 3.382 18H18a2 2 0 0 0 2-2V8h2v8a4 4 0 0 1-4 4zm8-16V2.068a.5.5 0 0 1 .82-.385l4.12 3.433a.5.5 0 0 1-.321.884H6a2 2 0 0 0-2 2v8H2V8a4 4 0 0 1 4-4z"></path>
+                </svg>
+              </span>
+            </button>
+
+            <!-- 音乐列表按钮 -->
+            <button class="control-button" id="listBtn" style="margin-right: 30px" title="播放列表">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="#fff" d="M4 9q-.425 0-.712-.288T3 8V6q0-.425.288-.712T4 5h2q.425 0 .713.288T7 6v2q0 .425-.288.713T6 9zm5 0q-.425 0-.712-.288T8 8V6q0-.425.288-.712T9 5h11q.425 0 .713.288T21 6v2q0 .425-.288.713T20 9zm0 5q-.425 0-.712-.288T8 13v-2q0-.425.288-.712T9 10h11q.425 0 .713.288T21 11v2q0 .425-.288.713T20 14zm0 5q-.425 0-.712-.288T8 18v-2q0-.425.288-.712T9 15h11q.425 0 .713.288T21 16v2q0 .425-.288.713T20 19zm-5 0q-.425 0-.712-.288T3 18v-2q0-.425.288-.712T4 15h2q.425 0 .713.288T7 16v2q0 .425-.288.713T6 19zm0-5q-.425 0-.712-.288T3 13v-2q0-.425.288-.712T4 10h2q.425 0 .713.288T7 11v2q0 .425-.288.713T6 14z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 音乐列表面板（默认隐藏） -->
+      <div class="playlist-panel hidden" id="playlistPanel">
+        <div class="playlist-header">
+          <h3>播放列表</h3>
+          <button id="closeListBtn">×</button>
+        </div>
+        <ul id="playlistList"></ul>
+      </div>
+    </div>
+
+<style>
+.music-player-container {
+  width: 900px;
+  height: 600px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-family: 'Helvetica Neue', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+/* 主内容区：左右布局 */
+.main-content {
+  display: flex;
+  height: calc(100% - 80px); /* 留出底部控制栏 */
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* ✅ 统一蒙层容器 —— 关键！ */
+.content-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.track-info {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* 垂直居中 */
+  gap: 16px;
+}
+
+.track-details {
+  text-align: center;
+}
+
+.track-title {
+  font-size: 2.6em;
+  font-weight: 700;
+  margin: 8px 0;
+  background: linear-gradient(90deg, #f3f1f0, #832df6); /* 浅白到稍暗的灰色 */
+  -webkit-background-clip: text; /* Webkit 特有属性 */
+  -webkit-text-fill-color: transparent; /* 让文本透明，显示背景 */
+  letter-spacing: 1px;
+}
+
+.artist-name {
+  background: linear-gradient(90deg, #f5f2f2, #ee3f11); /* 浅白到更浅的灰色 */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.5em;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* 歌词区域 */
+.lyric-display {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 垂直居中 */
+  align-items: center;
+  padding: 0 32px;
+  overflow: hidden; /* 隐藏超出的行 */
+  text-align: center;
+  font-size: 1.2em;
+  line-height: 1.6;
+  color: white;
+  font-weight: 500;
+  gap: 8px;
+}
+
+.lyric-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.4; /* 默认较淡 */
+  transition: all 0.2s ease;
+  transform: scale(0.95);
+}
+
+/* 当前句：最亮、最大、不缩放 */
+.lyric-line[data-offset="0"] {
+  opacity: 1;
+  background: linear-gradient(90deg, #f3f1f0, #07f5ec); /* 浅白到稍暗的灰色 */
+  -webkit-background-clip: text; /* Webkit 特有属性 */
+  -webkit-text-fill-color: transparent; /* 让文本透明，显示背景 */
+  font-weight: 700;
+  font-size: 1.2em;
+  transform: scale(1);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 上下紧邻句 */
+.lyric-line[data-offset="-1"],
+.lyric-line[data-offset="1"] {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* 再远一句 */
+.lyric-line[data-offset="-2"],
+.lyric-line[data-offset="2"] {
+  opacity: 0.6;
+}
+
+/* 最远两句（±3） */
+.lyric-line[data-offset="-3"],
+.lyric-line[data-offset="3"] {
+  opacity: 0.3;
+}
+
+/* 控制栏固定在底部 */
+.playback-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-info {
+  display: flex;
+  justify-content: center;
+  color: #aaa;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer; /* 点击轨道时有手型 */
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  border-radius: 2px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.progress-handle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  z-index: 2;
+}
+
+.progress-handle:active {
+  cursor: grabbing;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between; /* 左右分离 */
+  align-items: center;
+  gap: 0; /* 子项内部间距由子容器控制 */
+}
+
+.left-controls,
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 按钮之间间距 */
+}
+
+.control-button {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.control-button svg {
+  display: block; /* 去除 inline 元素的基线间隙 */
+}
+
+.control-button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.play-pause .icon-pause {
+  display: none;
+}
+
+.playing .icon-play { display: none; }
+.playing .icon-pause { display: block; }
+
+/* 播放列表面板 —— 右侧抽屉式 */
+.playlist-panel {
+  position: absolute;
+  top: 50px;
+  right: 0; /* 👈 关键：靠右 */
+  width: 280px; /* 👈 固定宽度 */
+  height: calc(100% - 146px); /* 👈 高度 = 总高 - 底部控制栏 80px */
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  padding: 24px 16px; /* 左右内边距稍小，适配窄宽 */
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(280px); /* 初始隐藏在右侧外 */
+  transition: transform 0.3s ease;
+}
+
+.playlist-panel:not(.hidden) {
+  transform: translateX(0);
+}
+
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 8px; /* 避免 close 按钮贴边 */
+}
+
+.playlist-header h3 {
+  margin: 0;
+  font-size: 1.1em;
+  color: white;
+}
+
+#closeListBtn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 24px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s;
+}
+
+#closeListBtn:hover {
+  color: white;
+}
+
+#playlistList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto; /* 👈 允许滚动 */
+  flex: 1; /* 👈 占据剩余空间 */
+}
+
+#playlistList li {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.95em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#playlistList li:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#playlistList li.active {
+  background: rgba(0, 114, 255, 0.3);
+  font-weight: bold;
+  color: #4da6ff;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.change-bg-btn {
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.change-bg-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== 音量控制样式 ===== */
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volume-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+}
+
+/* 滑块本体 */
+.volume-slider {
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.15); /* 整个轨道底色 */
+  border-radius: 2px;
+  outline: none;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+/* 已填充部分（Webkit 浏览器：Chrome, Edge, Safari） */
+.volume-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #4da6ff, #4da6ff) no-repeat;
+  background-size: var(--progress, 0%) 100%;
+  border-radius: 2px;
+}
+
+/* 滑块按钮（thumb）—— 垂直居中 */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  margin-top: -2px;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox 支持（基础填充） */
+.volume-slider::-moz-range-track {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  height: 4px;
+}
+
+.volume-slider::-moz-range-progress {
+  background: #4da6ff;
+  border-radius: 2px;
+  height: 4px;
+}
+
+/* 数值显示 */
+.volume-value {
+  color: #4da6ff;
+  font-size: 0.85em;
+  min-width: 36px;
+  text-align: center;
+}
+  </style>

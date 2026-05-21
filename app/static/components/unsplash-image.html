@@ -1,0 +1,504 @@
+
+<style>
+    .photo-gallery-container {
+      padding: 0 20px 40px;
+      width: 100%;
+      max-width: 1200px;
+      min-height: 650px; /* 最小高度保证美观，但允许增长 */
+      max-height: none;  /* 不限制最大高度 */
+      margin: 0 auto;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #fff;
+      overflow-y: auto; /* 当内容超出容器高度时启用垂直滚动 */
+      overflow-x: hidden;
+    }
+    .unsplash-toolbar {
+      padding: 24px;
+      border-bottom: 1px solid #eee;
+      color: #000 !important;
+    }
+    .toolbar-main-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .search-type-control {
+      display: flex;
+      gap: 4px;
+    }
+    .search-type-btn {
+      padding: 8px 16px;
+      border: 1px solid #dcdfe6;
+      background: #f5f7fa;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .search-type-btn.active {
+      background: #409eff;
+      color: white;
+      border-color: #409eff;
+    }
+
+    /* 单选组 */
+    .radio-group {
+      display: flex;
+      gap: 8px;
+    }
+    .radio-btn {
+      padding: 4px 12px;
+      border: 1px solid #ddd;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      border-radius: 4px;
+    }
+    .radio-btn.active {
+      background: #409eff;
+      color: white;
+      border-color: #409eff;
+    }
+
+    /* 搜索框 */
+    .main-search-container {
+      position: relative;
+      flex: 1;
+      min-width: 300px;
+      max-width: 600px;
+    }
+    .main-search-input {
+      width: 100%;
+      padding: 10px 40px 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .main-search-input:focus {
+      border-color: #409eff;
+    }
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #999;
+      font-size: 18px;
+    }
+
+    /* 高级选项：默认隐藏 */
+    .advanced-collapse {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .advanced-collapse.open {
+      max-height: 500px;
+    }
+    .advanced-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #eee;
+    }
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+    }
+    .filter-label {
+      width: 80px;
+      text-align: right;
+      color: #333;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    /* ———————— 全新页码/每页控件样式 ———————— */
+    .page-stepper {
+      display: flex;
+      height: 28px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden; /* 圆角包裹 */
+      background: #fff;
+    }
+    .page-stepper button {
+      width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+      transition: background 0.2s;
+    }
+    .page-stepper button:hover {
+      background: #e9ecef;
+    }
+    .page-stepper input {
+      width: 52px;
+      height: 100%;
+      text-align: center;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      -moz-appearance: textfield; /* 隐藏 Firefox 数字箭头 */
+    }
+    /* 隐藏 Chrome/Safari 的上下箭头 */
+    .page-stepper input::-webkit-outer-spin-button,
+    .page-stepper input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .unit-text {
+      color: #999;
+      font-size: 13px;
+    }
+
+    .collections-id-input {
+      display: flex;
+      align-items: center;
+      width: 400px;
+      height: 32px;
+      padding: 0 12px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      transition: border-color 0.2s;
+    }
+    .collections-id-input > input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      min-width: 0;
+    }
+    .collections-id-input:focus-within {
+      border-color: #409eff;
+    }
+
+    /* 色块选择器 */
+    .color-swatch-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #ddd;
+    }
+    .color-swatch.active {
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.4);
+    }
+
+    .toggle-advanced {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    .toggle-advanced:hover {
+      color: #409eff;
+    }
+
+
+    /* 图片区 */
+    .main-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center; /* 居中对齐 */
+      gap: 20px; /* 卡片间距 */
+      padding: 20px 0;
+      max-width: 1160px; /* 与容器内宽一致 */
+      margin: 0 auto;    /* 居中对齐 */
+      overflow-y: auto;  /* 启用垂直滚动 */
+    }
+    /* —————— 图片卡片新布局 —————— */
+    .photo-card {
+      width: 360px; /* 固定宽度 */
+      height: 270px; /* 固定高度 */
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      will-change: transform; /* 提示浏览器将此元素独立图层 */
+    }
+    .photo-card:hover {
+      transform: translateY(0) translateZ(0); /* translateZ 强制开启硬件加速 */
+      z-index: 10;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15); /* 可选：增强悬浮感 */
+    }
+    /* 图片填充整个卡片 */
+    .photo-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* 悬浮信息层 - 默认隐藏在底部外 */
+    .photo-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.7); /* 半透明黑底 */
+      color: white;
+      font-size: 13px;
+      line-height: 1.4;
+      transform: translateY(100%); /* 完全隐藏在下方 */
+      transition: transform 0.3s ease;
+      border-radius: 0 0 12px 12px;
+    }
+    .photo-card:hover .photo-overlay {
+      transform: translateY(0); /* 滑入视图 */
+    }
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 4px;
+      color: white !important;
+    }
+    .info-label {
+      flex: none;
+      color: #bbbbbb;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .info-link {
+      color: white !important;
+      text-decoration: none;
+      word-break: break-word;
+    }
+    .info-link:hover {
+      text-decoration: underline;
+    }
+
+    /* 隐藏用 */
+    .hidden { display: none !important; }
+
+    /* —————— 分页按钮样式（模拟 Element Plus） —————— */
+    .pagination-controls {
+      text-align: center;
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+    .el-button {
+      display: inline-block;
+      line-height: 1.5;
+      white-space: nowrap;
+      cursor: pointer;
+      background: #fff;
+      border: 1px solid #dcdfe6;
+      color: #606266;
+      padding: 8px 15px;
+      border-radius: 4px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .el-button:hover {
+      color: #409eff;
+      border-color: #c6e2ff;
+      background-color: #ecf5ff;
+    }
+    .el-button:disabled {
+      color: #c0c4cc;
+      cursor: not-allowed;
+      background-color: #fff;
+      border-color: #ebeef5;
+    }
+    .el-button--small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* —————— 空状态 —————— */
+    .empty-state {
+      width: 100%; /* 占满一行 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px; /* 确保有足够空间 */
+      color: #999;
+      margin: 0 auto;
+    }
+    .empty-state.hidden { display: none; }
+    /* —————— 空状态内容样式 —————— */
+    .empty-state > div {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state h3 {
+      font-size: 18px;        /* 明确字号 */
+      margin-bottom: 24px;    /* 与按钮的间距 */
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .try-nature-btn {
+      background: transparent;
+      color: #409eff;
+      border: 1px solid #409eff;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .try-nature-btn:hover {
+      background: rgba(64, 158, 255, 0.1);
+      border-color: #409eff;
+    }
+
+    /* 确保按钮激活或悬停时的文字颜色为白色 */
+    .search-type-btn.active,
+    .radio-btn.active,
+    .color-swatch.active {
+      color: white !important;
+    }
+  </style>
+
+<div class="photo-gallery-container" style="margin-top: 60px">
+  <div class="unsplash-toolbar">
+    <div class="toolbar-main-row">
+      <div class="search-type-control" id="searchTypeGroup">
+        <div class="search-type-btn active" data-type="photos">搜索照片</div>
+        <div class="search-type-btn" data-type="collections">搜索收藏</div>
+      </div>
+
+      <div class="main-search-container">
+        <input type="text" class="main-search-input" placeholder="搜索照片，如：nature、city、mountains" id="mainSearchInput" />
+        <span class="search-icon" id="searchTrigger" title="搜索">🔍</span>
+      </div>
+    </div>
+
+    <!-- 高级选项容器 -->
+    <div class="advanced-collapse" id="advancedCollapse">
+      <div class="advanced-filters">
+
+        <div class="filter-row" data-visible-for="photos">
+          <span class="filter-label">关联：</span>
+          <div class="radio-group" id="sortGroup">
+            <div class="radio-btn active" data-value="relevant">相关性高</div>
+            <div class="radio-btn" data-value="latest">最新发布</div>
+          </div>
+        </div>
+
+        <div class="filter-row" data-visible-for="photos">
+          <span class="filter-label">方向：</span>
+          <div class="radio-group" id="orientationGroup">
+            <div class="radio-btn active" data-value="landscape">横屏</div>
+            <div class="radio-btn" data-value="portrait">竖屏</div>
+            <div class="radio-btn" data-value="squarish">方形</div>
+          </div>
+        </div>
+
+        <div class="filter-row" data-visible-for="photos">
+          <span class="filter-label">安全过滤：</span>
+          <div class="radio-group" id="safeGroup">
+            <div class="radio-btn active" data-value="low">低过滤</div>
+            <div class="radio-btn" data-value="high">高过滤</div>
+          </div>
+        </div>
+
+        <div class="filter-row" data-visible-for="photos">
+          <span class="filter-label">颜色：</span>
+          <div class="color-swatch-group" id="colorGroup">
+            <span class="color-swatch white-black active" title="黑白" style="background: linear-gradient(to right, #000 55%, #fff 45%);" data-value="black_and_white"></span>
+            <span class="color-swatch" title="黑" style="background:#000;" data-value="black"></span>
+            <span class="color-swatch" title="白" style="background:#fff;border: 1px solid #ccc;" data-value="white"></span>
+            <span class="color-swatch" title="红" style="background:#ff0000;" data-value="red"></span>
+            <span class="color-swatch" title="橙" style="background:#ffa500;" data-value="orange"></span>
+            <span class="color-swatch" title="黄" style="background:#ffff00;" data-value="yellow"></span>
+            <span class="color-swatch" title="绿" style="background:#008000;" data-value="green"></span>
+            <span class="color-swatch" title="青" style="background:#008080;" data-value="teal"></span>
+            <span class="color-swatch" title="蓝" style="background:#0000ff;" data-value="blue"></span>
+            <span class="color-swatch" title="紫" style="background:#800080;" data-value="purple"></span>
+            <span class="color-swatch" title="品红" style="background:#ff00ff;" data-value="magenta"></span>
+          </div>
+        </div>
+
+        <!-- 页码 -->
+        <div class="filter-row" data-visible-for="photos,collections">
+          <span class="filter-label">页码：</span>
+          <div class="page-stepper">
+            <button class="stepper-minus">−</button>
+            <input type="number" value="1" min="1" id="pageInput" />
+            <button class="stepper-plus">+</button>
+          </div>
+        </div>
+
+        <!-- 每页 -->
+        <div class="filter-row" data-visible-for="photos,collections">
+          <span class="filter-label">每页：</span>
+          <div class="page-stepper">
+            <button class="stepper-minus">−</button>
+            <input type="number" value="12" min="1" max="32" id="perPageInput" />
+            <button class="stepper-plus">+</button>
+          </div>
+          <span class="unit-text">张</span>
+        </div>
+
+        <!-- 集合ID -->
+        <div class="filter-row" data-visible-for="photos">
+          <span class="filter-label">集合ID：</span>
+          <div class="collections-id-input input-container" title="输入一个或多个集合ID...">
+            <input type="text" placeholder="多个ID用英文逗号分隔" id="collectionsInput"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toggle-advanced" id="toggleAdvanced">▼ 展开高级选项</div>
+  </div>
+
+  <div class="main-content" id="imageGrid"></div>
+
+  <!-- 空状态（默认隐藏） -->
+  <div class="empty-state hidden" id="emptyState">
+      <div>
+        <h3>暂无图片数据</h3>
+        <button class="el-button try-nature-btn" id="tryNatureBtn">试试「nature」</button>
+      </div>
+    </div>
+
+  <div class="pagination-controls hidden" id="paginationControls">
+    <button class="el-button el-button--small" id="prevPageBtn" disabled>上一页</button>
+    <span class="page-info">第 <span id="currentPageDisplay">1</span> 页</span>
+    <span class="page-info">总共 <span id="totalItemsDisplay">0</span> 条</span>
+    <span class="page-info"><span id="totalPagesDisplay">0</span> 页</span>
+    <button class="el-button el-button--small" id="nextPageBtn">下一页</button>
+  </div>
+
+  <!-- 👇 加这个，方便 JS 判断是否已注入 -->
+  <div data-unsplash-init style="display:none;"></div>
+</div>

@@ -1,0 +1,579 @@
+
+<style>
+    .photo-gallery-container {
+      padding: 0 20px 40px;
+      width: 100%;
+      max-width: 1200px;
+      min-height: 650px; /* 最小高度保证美观，但允许增长 */
+      max-height: none;  /* 不限制最大高度 */
+      margin: 0 auto;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #fff;
+      overflow-y: auto; /* 当内容超出容器高度时启用垂直滚动 */
+      overflow-x: hidden;
+    }
+    /* ========== 工具栏 ========== */
+    .pexels-toolbar {
+      padding: 24px;
+      border-bottom: 1px solid #eee;
+      color: #000 !important;
+    }
+    .toolbar-main-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    /* 搜索类型切换 */
+    .search-type-control {
+      display: flex;
+      gap: 4px;
+    }
+    .search-type-btn {
+      padding: 8px 16px;
+      border: 1px solid #dcdfe6;
+      background: #f5f7fa;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .search-type-btn.active {
+      background: #409eff;
+      color: white;
+      border-color: #409eff;
+    }
+
+    /* 搜索框 */
+    .main-search-container {
+      position: relative;
+      flex: 1;
+      min-width: 300px;
+      max-width: 600px;
+    }
+    .main-search-input {
+      width: 100%;
+      padding: 10px 40px 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .main-search-input:focus {
+      border-color: #409eff;
+    }
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #999;
+      font-size: 18px;
+    }
+
+    /* 高级筛选 */
+    .advanced-collapse {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .advanced-collapse.open {
+      max-height: 500px;
+    }
+    .advanced-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #eee;
+    }
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+    }
+    .filter-label {
+      width: 80px;
+      text-align: right;
+      color: #333;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    /* 单选组 */
+    .radio-group {
+      display: flex;
+      gap: 8px;
+    }
+    .radio-btn {
+      padding: 4px 12px;
+      border: 1px solid #ddd;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      border-radius: 4px;
+    }
+    .radio-btn.active {
+      background: #409eff;
+      color: white;
+      border-color: #409eff;
+    }
+
+    /* 色块选择器 */
+    .color-swatch-group,
+    .locale-swatch-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #ddd;
+    }
+    .color-swatch.active {
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.4);
+    }
+
+    .locale-swatch {
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      min-width: 56px;
+      text-align: center;
+    }
+    .locale-swatch.active {
+      background: #409eff;
+      color: white;
+      border-color: #409eff;
+    }
+
+    .toggle-advanced {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    .toggle-advanced:hover {
+      color: #409eff;
+    }
+
+    /* ———————— 全新页码/每页控件样式 ———————— */
+    .page-stepper {
+      display: flex;
+      height: 28px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden; /* 圆角包裹 */
+      background: #fff;
+    }
+    .page-stepper button {
+      width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+      transition: background 0.2s;
+    }
+    .page-stepper button:hover {
+      background: #e9ecef;
+    }
+    .page-stepper input {
+      width: 52px;
+      height: 100%;
+      text-align: center;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      -moz-appearance: textfield; /* 隐藏 Firefox 数字箭头 */
+    }
+    /* 隐藏 Chrome/Safari 的上下箭头 */
+    .page-stepper input::-webkit-outer-spin-button,
+    .page-stepper input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .pagination-controls {
+      text-align: center;
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+    .unit-text {
+      color: #999;
+      font-size: 13px;
+    }
+
+
+    /* ========== 内容区 ========== */
+    /* 图片区 */
+    .main-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center; /* 居中对齐 */
+      gap: 20px; /* 卡片间距 */
+      padding: 20px 0;
+      max-width: 1160px; /* 与容器内宽一致 */
+      margin: 0 auto;    /* 居中对齐 */
+      overflow-y: auto;
+    }
+    /* —————— 图片卡片新布局 —————— */
+    .photo-card {
+      width: 360px; /* 固定宽度 */
+      height: 270px; /* 固定高度 */
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      will-change: transform; /* 提示浏览器将此元素独立图层 */
+    }
+    .photo-card:hover {
+      transform: translateY(0) translateZ(0); /* translateZ 强制开启硬件加速 */
+      z-index: 10;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15); /* 可选：增强悬浮感 */
+    }
+    /* 图片填充整个卡片 */
+    .photo-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* 悬浮信息层 - 默认隐藏在底部外 */
+    .photo-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.7); /* 半透明黑底 */
+      color: white;
+      font-size: 13px;
+      line-height: 1.4;
+      transform: translateY(100%); /* 完全隐藏在下方 */
+      transition: transform 0.3s ease;
+      border-radius: 0 0 12px 12px;
+    }
+    .photo-card:hover .photo-overlay {
+      transform: translateY(0); /* 滑入视图 */
+    }
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 4px;
+      color: white !important;
+    }
+    .info-label {
+      flex: none;
+      color: #bbbbbb;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .info-link {
+      color: white !important;
+      text-decoration: none;
+      word-break: break-word;
+    }
+    .info-link:hover {
+      text-decoration: underline;
+    }
+
+    .video-author-overlay {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  backdrop-filter: blur(2px);
+  z-index: 10;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+    .video-author-overlay a {
+      color: #4fc3f7;
+      text-decoration: none;
+    }
+    .video-author-overlay a:hover {
+      text-decoration: underline;
+    }
+    /* 视频元素的样式 */
+    .photo-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 保证视频填充整个卡片，不拉伸 */
+    }
+
+     /* 隐藏用 */
+    .hidden { display: none !important; }
+
+    /* —————— 分页按钮样式（模拟 Element Plus） —————— */
+    .pagination-controls {
+      text-align: center;
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+    .el-button {
+      display: inline-block;
+      line-height: 1.5;
+      white-space: nowrap;
+      cursor: pointer;
+      background: #fff;
+      border: 1px solid #dcdfe6;
+      color: #606266;
+      padding: 8px 15px;
+      border-radius: 4px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .el-button:hover {
+      color: #409eff;
+      border-color: #c6e2ff;
+      background-color: #ecf5ff;
+    }
+    .el-button:disabled {
+      color: #c0c4cc;
+      cursor: not-allowed;
+      background-color: #fff;
+      border-color: #ebeef5;
+    }
+    .el-button--small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* —————— 空状态 —————— */
+    .empty-state {
+      width: 100%; /* 占满一行 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px; /* 确保有足够空间 */
+      color: #999;
+      margin: 0 auto;
+    }
+    .empty-state.hidden { display: none; }
+    /* —————— 空状态内容样式 —————— */
+    .empty-state > div {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state h3 {
+      font-size: 18px;        /* 明确字号 */
+      margin-bottom: 24px;    /* 与按钮的间距 */
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .try-nature-btn {
+      background: transparent;
+      color: #409eff;
+      border: 1px solid #409eff;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .try-nature-btn:hover {
+      background: rgba(64, 158, 255, 0.1);
+      border-color: #409eff;
+    }
+
+    /* 确保按钮激活或悬停时的文字颜色为白色 */
+    .search-type-btn.active,
+    .radio-btn.active,
+    .color-swatch.active {
+      color: white !important;
+    }
+  </style>
+
+<div class="photo-gallery-container" style="margin-top: 60px">
+  <!-- 工具栏 -->
+  <div class="pexels-toolbar">
+    <div class="toolbar-main-row">
+      <!-- 搜索类型 -->
+      <div class="search-type-control">
+        <div class="search-type-btn active" data-type="photos">搜索照片</div>
+        <div class="search-type-btn" data-type="videos">搜索视频</div>
+      </div>
+
+      <!-- 搜索框 -->
+      <div class="main-search-container">
+        <input type="text" class="main-search-input" placeholder="搜索照片，如：nature、city" />
+        <span class="search-icon" id="searchTrigger">🔍</span>
+      </div>
+    </div>
+
+    <!-- 高级筛选 -->
+    <div class="advanced-collapse" id="advancedCollapse">
+      <div class="advanced-filters">
+        <!-- 方向 -->
+        <div class="filter-row" data-visible-for="photos,videos">
+          <span class="filter-label">方向：</span>
+          <div class="radio-group" data-param="orientation">
+            <div class="radio-btn active" data-value="landscape">横屏</div>
+            <div class="radio-btn" data-value="portrait">竖屏</div>
+            <div class="radio-btn" data-value="square">方形</div>
+          </div>
+        </div>
+
+        <!-- 照片尺寸 -->
+        <div class="filter-row" data-visible-for="photos">
+          <span class="filter-label">尺寸：</span>
+          <div class="radio-group" data-param="size">
+            <div class="radio-btn active" data-value="small">4MP</div>
+            <div class="radio-btn" data-value="medium">12MP</div>
+            <div class="radio-btn" data-value="large">24MP</div>
+          </div>
+        </div>
+
+        <!-- 视频像素 -->
+        <div class="filter-row" data-visible-for="videos">
+          <span class="filter-label">像素：</span>
+          <div class="radio-group" data-param="size">
+            <div class="radio-btn active" data-value="small">高清</div>
+            <div class="radio-btn" data-value="medium">全高清</div>
+            <div class="radio-btn" data-value="large">4K</div>
+          </div>
+        </div>
+
+        <!-- 颜色 -->
+        <div class="filter-row" data-visible-for="photos">
+          <span class="filter-label">颜色：</span>
+          <div class="color-swatch-group" data-param="color">
+            <span class="color-swatch active" title="黑" data-value="black" style="background:#000;"></span>
+            <span class="color-swatch" title="白" data-value="white" style="background:#fff;"></span>
+            <span class="color-swatch" title="红" data-value="soft-red" style="background:#ff6b6b;"></span>
+            <span class="color-swatch" title="橙" data-value="soft-orange" style="background:#ffa94d;"></span>
+            <span class="color-swatch" title="黄" data-value="soft-yellow" style="background:#face67;"></span>
+            <span class="color-swatch" title="绿" data-value="soft-green" style="background:#6bc145;"></span>
+            <span class="color-swatch" title="青" data-value="turquoise" style="background:#4bd3c8;"></span>
+            <span class="color-swatch" title="蓝" data-value="sky-blue" style="background:#4a90e2;"></span>
+            <span class="color-swatch" title="紫" data-value="violet" style="background:#b87fe5;"></span>
+            <span class="color-swatch" title="品红" data-value="soft-pink" style="background:#f564a1;"></span>
+          </div>
+        </div>
+
+        <!-- 地区 -->
+        <div class="filter-row" data-visible-for="photos,videos">
+          <span class="filter-label">地区：</span>
+          <div class="locale-swatch-group" data-param="locale">
+            <!-- 完整地区列表（按你原始数据） -->
+            <span class="locale-swatch active" data-value="zh-CN">中国</span>
+            <span class="locale-swatch" data-value="en-US">美国</span>
+            <span class="locale-swatch" data-value="pt-BR">巴西</span>
+            <span class="locale-swatch" data-value="es-ES">西班牙</span>
+            <span class="locale-swatch" data-value="ca-ES">加泰罗尼亚</span>
+            <span class="locale-swatch" data-value="de-DE">德国</span>
+            <span class="locale-swatch" data-value="it-IT">意大利</span>
+            <span class="locale-swatch" data-value="fr-FR">法国</span>
+            <span class="locale-swatch" data-value="sv-SE">瑞典</span>
+            <span class="locale-swatch" data-value="id-ID">印度尼西亚</span>
+            <span class="locale-swatch" data-value="pl-PL">波兰</span>
+            <span class="locale-swatch" data-value="ja-JP">日本</span>
+            <span class="locale-swatch" data-value="zh-TW">中国台湾</span>
+            <span class="locale-swatch" data-value="ko-KR">韩国</span>
+            <span class="locale-swatch" data-value="th-TH">泰国</span>
+            <span class="locale-swatch" data-value="nl-NL">荷兰</span>
+            <span class="locale-swatch" data-value="hu-HU">匈牙利</span>
+            <span class="locale-swatch" data-value="vi-VN">越南</span>
+            <span class="locale-swatch" data-value="cs-CZ">捷克</span>
+            <span class="locale-swatch" data-value="da-DK">丹麦</span>
+            <span class="locale-swatch" data-value="fi-FI">芬兰</span>
+            <span class="locale-swatch" data-value="uk-UA">乌克兰</span>
+            <span class="locale-swatch" data-value="el-GR">希腊</span>
+            <span class="locale-swatch" data-value="ro-RO">罗马尼亚</span>
+            <span class="locale-swatch" data-value="nb-NO">挪威</span>
+            <span class="locale-swatch" data-value="sk-SK">斯洛伐克</span>
+            <span class="locale-swatch" data-value="tr-TR">土耳其</span>
+            <span class="locale-swatch" data-value="ru-RU">俄罗斯</span>
+          </div>
+        </div>
+
+        <!-- 页码 & 每页数量 -->
+        <div class="filter-row" data-visible-for="photos,videos">
+          <span class="filter-label">页码：</span>
+          <div class="page-stepper">
+            <button class="stepper-minus">−</button>
+            <input type="number" value="1" min="1" id="pageInput" />
+            <button class="stepper-plus">+</button>
+          </div>
+        </div>
+
+        <div class="filter-row" data-visible-for="photos,videos">
+          <span class="filter-label">每页：</span>
+          <div class="page-stepper">
+            <button class="stepper-minus">−</button>
+            <input type="number" value="12" min="1" max="32" id="perPageInput" />
+            <button class="stepper-plus">+</button>
+          </div>
+          <span class="unit-text">张</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="toggle-advanced" id="toggleAdvanced">▼ 展开高级选项</div>
+  </div>
+
+  <!-- 内容区 -->
+  <div class="main-content" id="imageGrid"></div>
+
+  <!-- 空状态（默认隐藏） -->
+  <div class="empty-state hidden" id="emptyState">
+      <div>
+        <h3>暂无图片数据</h3>
+        <button class="el-button try-nature-btn" id="tryNatureBtn">试试「nature」</button>
+      </div>
+    </div>
+
+  <!-- 分页 -->
+  <div class="pagination-controls hidden" id="paginationControls">
+    <button class="el-button el-button--small" id="prevPageBtn" disabled>上一页</button>
+    <span class="page-info">第 <span id="currentPageDisplay">1</span> 页</span>
+    <span class="page-info">总共 <span id="totalItemsDisplay">0</span> 条</span>
+    <span class="page-info"><span id="totalPagesDisplay">0</span> 页</span>
+    <button class="el-button el-button--small" id="nextPageBtn">下一页</button>
+  </div>
+
+  <!-- 👇 加这个，方便 JS 判断是否已注入 -->
+  <div data-pexeles-init style="display:none;"></div>
+</div>

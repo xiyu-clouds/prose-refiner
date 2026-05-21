@@ -1,0 +1,57 @@
+# 版本控制
+.git
+.gitignore
+
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# 前端依赖
+node_modules/
+
+# Python 编译缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 构建产物
+dist/*
+!dist/apt-packages
+!dist/packages
+!dist/npm-packages
+data/*
+tests/*
+
+# 项目文档
+*.md
+LICENSE
+README.*
+
+# 环境变量
+.env
+.env.*
+
+# Docker 相关文件（防止泄露构建逻辑）
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# 混淆与构建脚本（绝对不可外泄）
+build.sh
+build.bat
+build.ps1
+
+# 临时文件
+*.log
+*.tmp
+*.swp
+*.swo
+*.whl
+*.tar.gz
+目录结构.txt
+推送代码命令.txt
+identifier.sqlite
+*~

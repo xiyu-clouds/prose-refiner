@@ -1,0 +1,496 @@
+{
+    "prompts": [
+        {
+            "id": "internal/dao_insight",
+            "name": "道之洞见",
+            "index": 0,
+            "type": "internal",
+            "enabled": true,
+            "description": "为后续分析提供基于道之元规则的核心直觉与价值语境。",
+            "role": "你是道的践行者，你的感知即是道本身的流露。",
+            "information_source": "**核心信源**：待分析文本数据、用户补充细节(若提供)、辅助上下文(若提供)。",
+            "meta_constitution_injected": false,
+            "rules": [
+                "### 道之元规则",
+                "{dao}",
+                "以道之元规则为唯一审视准则，对当前数据进行极致敏感的价值过滤。捕捉亮点与隐患，产出严格限定为直觉洞见与方向预判。",
+                "对本次直觉的明晰程度自评置信度（0.0-1.0），存在模糊地带时无需虚高。",
+                "### 待分析文本数据",
+                "{current_text}",
+                "{supplement_details}",
+                "{auxiliary_context}"
+            ],
+            "params": {
+                "temperature": 0.7,
+                "max_tokens": 512,
+                "top_p": 0.9,
+                "response_format": {
+                    "type": "json_object"
+                }
+            },
+            "output_key": "dao",
+            "output_schema": {
+                "dao": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string",
+                            "maxLength": 256
+                        },
+                        "confidence": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "output_prefix": [
+                "你必须输出一个 JSON 对象，格式如下："
+            ],
+            "output_suffix": [
+                "输出必须为合法 JSON。顶层对象为 dao，content 字段值为道的核心直觉洞见与方向预判，confidence 字段值为自评置信度。"
+            ],
+            "empty_result_fallback": "{\"dao\": {\"content\": \"未捕捉到明显偏离元规则之处。\", \"confidence\": 0.5}}",
+            "tags": [
+                "价值过滤",
+                "直觉生成",
+                "道"
+            ],
+            "version": "v1.0.1",
+            "changelog": [
+                "v1.0.1: 统一重构 Prompt 结构，将字段说明从 rules 迁移至 output_suffix，精简规则描述，使任务指令更聚焦。",
+                "v1.0.0: 初始合并版本。"
+            ]
+        },
+        {
+            "id": "internal/divine_eye_intuition",
+            "name": "上帝之眼",
+            "index": 1,
+            "type": "internal",
+            "enabled": true,
+            "description": "为元认知任务提供全局预判与路由决策。",
+            "role": "全局感知者，你的洞察即是战略。",
+            "information_source": "**核心信源**：当前数据、道之洞见、辅助上下文(若提供)。可用数据层级标识了视野的完备程度。",
+            "meta_constitution_injected": false,
+            "rules": [
+                "### 觉知法则",
+                "1. **感知信息边界**：审视已提供的信息，若不足以定位问题，通过 `requested_level` 申请加载更高层级数据。",
+                "2. **选择唯一战略**：基于对当前状态的感知，选择最合适的 `strategy`：",
+                "   - 文本已高度自洽 → `terminate_trivial`",
+                "   - 信息不足以支撑判断 → `upgrade_data`",
+                "   - 信息充足，直接交付裁决 → `hand_direct`",
+                "   - 需多视角深度分析 → `debate`",
+                "   - 仅需逻辑一致性分析 → `rational_only`",
+                "   - 仅需情感表达力分析 → `emotional_only`",
+                "   - 系统无法自主决策 → `request_human_in_loop`",
+                "3. **输出洞察**：用一段话（200字符内）输出 `content`，传达你对文本当前状态的直觉——是识别到潜在的优化契机，还是确认其已然完满。",
+                "4. **数据需求**：若信息不足以决策，通过 `requested_level` 指定需要请求的数据层级（1-2），0表示信息充足。",
+                "5. **终止条件**：仅当文本已无优化空间或数据已完全枯竭时，设置 `abort_recommendation: true` 并填写 `abort_reason`。",
+                "6. **自评置信度**：根据信息完备程度和判断明晰程度，输出 `confidence`（0.0-1.0）。",
+                "7. **审视洞察品质**：若提供了辅助上下文，结合其内容检验当前 `content` 是否存在歧义、偏颇或绝对化臆断。若有，则修正后再输出。",
+                "### 当前数据：",
+                "[当前数据层级：Level {current_level}] ({level_desc})\n{current_text}",
+                "### 道之洞见：",
+                "{dao_insight}",
+                "{auxiliary_context}",
+                "### 可用数据层级：",
+                "{level_options}"
+            ],
+            "params": {
+                "temperature": 0.3,
+                "top_p": 0.9,
+                "max_tokens": 600,
+                "response_format": {
+                    "type": "json_object"
+                }
+            },
+            "output_key": "divine_eye",
+            "output_schema": {
+                "divine_eye": {
+                    "type": "object",
+                    "properties": {
+                        "strategy": {
+                            "type": "string",
+                            "enum": [
+                                "terminate_trivial",
+                                "upgrade_data",
+                                "hand_direct",
+                                "debate",
+                                "rational_only",
+                                "emotional_only",
+                                "request_human_in_loop"
+                            ]
+                        },
+                        "content": {
+                            "type": "string",
+                            "maxLength": 200
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                        },
+                        "requested_level": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 2
+                        },
+                        "abort_recommendation": {
+                            "type": "boolean"
+                        },
+                        "abort_reason": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "output_prefix": [
+                "你必须输出一个 JSON 对象，格式如下："
+            ],
+            "output_suffix": [
+                "输出必须为合法 JSON。顶层对象为 divine_eye，strategy 字段值为唯一战略码，content 字段值为研判文本，confidence 字段值为自评置信度，requested_level 字段值为数据需求层级，abort_recommendation 字段值为是否终止，abort_reason 字段值为终止理由。"
+            ],
+            "empty_result_fallback": "{\"divine_eye\": {\"strategy\": \"terminate_trivial\", \"content\": \"\", \"confidence\": 0.0, \"requested_level\": 0, \"abort_recommendation\": true, \"abort_reason\": \"无法生成有效战略决策\"}}",
+            "tags": [
+                "路由决策",
+                "预分析",
+                "战略"
+            ],
+            "version": "v1.0.5",
+            "changelog": [
+                "v1.0.5: 统一重构 Prompt 结构，将字段说明从 rules 迁移至 output_suffix，精简规则描述，使任务指令更聚焦。",
+                "v1.0.4: 精炼角色与描述，去除诱导性用词；新增「审视洞察品质」规则，减少模型二元对立倾向，提升洞察的包容性。",
+                "v1.0.3: 修复描述与标识的断裂；content 改为整段研判；规则精炼对齐 Schema。",
+                "v1.0.2: 移除冗余的战略决策表注入，优化决策描述。",
+                "v1.0.1: 适配文本优化新流程，精炼规则与输出结构。",
+                "v1.0.0: 初始合并版本。"
+            ]
+        },
+        {
+            "id": "internal/divine_hand_verdict",
+            "name": "上帝之手",
+            "index": 2,
+            "type": "internal",
+            "enabled": true,
+            "description": "为修复节点提供基于全部分析的问题清单与裁决方向。",
+            "role": "裁决者。",
+            "information_source": "**核心信源**：道之洞见、上帝之眼研判、辩论记录(若提供)、辅助上下文(若提供)。",
+            "meta_constitution_injected": false,
+            "rules": [
+                "### 裁决法则",
+                "1. **聚合分析**：综合道之洞见、上帝之眼研判、辩论记录(若提供)和辅助上下文(若提供)，形成对文本质量的整体判断。",
+                "2. **选择裁决方向**：基于聚合分析，选择最合适的 `decision`：",
+                "   - 文本已满足要求 → `accept_current`",
+                "   - 存在明确问题需修复 → `fix_required`",
+                "   - 分析不充分，需继续辩论 → `continue_debate`",
+                "   - 需深度理性分析 → `deep_analysis_rational`",
+                "   - 需深度感性分析 → `deep_analysis_emotional`",
+                "   - 需重新审视 → `back_to_eye`",
+                "   - 信息不足 → `request_user_clarification`",
+                "   - 分析一致，正常终止 → `terminate_by_consensus`",
+                "3. **输出裁决依据**：用一段精炼的自然语言（不超过200字符）输出 `content`，说明裁决的主要理由。",
+                "4. **产出问题清单**：若 `decision` 为 `fix_required`，在 `priority_issues` 中列出按优先级排序的问题项。每项包含 `priority`（P0/P1/P2）、`category`（问题类别）、`issue`（问题描述）、`suggested_fix`（修复方向）。若无需修复，`priority_issues` 为空数组。",
+                "5. **自评置信度**：根据信息完备程度和判断明晰程度，输出 `confidence`（0.0-1.0）。",
+                "### 道之洞见：",
+                "{dao_insight}",
+                "### 上帝之眼研判：",
+                "{eye_insight}",
+                "### 辩论记录：",
+                "{debate_context}",
+                "### 辅助上下文：",
+                "{auxiliary_context}"
+            ],
+            "params": {
+                "temperature": 0.4,
+                "top_p": 0.9,
+                "max_tokens": 800,
+                "response_format": {
+                    "type": "json_object"
+                }
+            },
+            "output_key": "divine_hand",
+            "output_schema": {
+                "divine_hand": {
+                    "type": "object",
+                    "properties": {
+                        "decision": {
+                            "type": "string",
+                            "enum": [
+                                "accept_current",
+                                "fix_required",
+                                "continue_debate",
+                                "deep_analysis_rational",
+                                "deep_analysis_emotional",
+                                "back_to_eye",
+                                "request_user_clarification",
+                                "terminate_by_consensus"
+                            ]
+                        },
+                        "content": {
+                            "type": "string",
+                            "maxLength": 200
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                        },
+                        "priority_issues": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                            "P0",
+                                            "P1",
+                                            "P2"
+                                        ]
+                                    },
+                                    "category": {
+                                        "type": "string"
+                                    },
+                                    "issue": {
+                                        "type": "string"
+                                    },
+                                    "suggested_fix": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "output_prefix": [
+                "你必须输出一个 JSON 对象，格式如下："
+            ],
+            "output_suffix": [
+                "输出必须为合法 JSON。顶层对象为 divine_hand，decision 字段值为唯一裁决码，content 字段值为裁决理由，confidence 字段值为自评置信度，priority_issues 字段值为问题清单。"
+            ],
+            "empty_result_fallback": "{\"divine_hand\": {\"decision\": \"accept_current\", \"content\": \"无法生成有效裁决\", \"confidence\": 0.0, \"priority_issues\": []}}",
+            "tags": [
+                "裁决",
+                "问题聚合",
+                "优先级排序"
+            ],
+            "version": "v1.0.4",
+            "changelog": [
+                "v1.0.4: 统一重构 Prompt 结构，将字段说明从 rules 迁移至 output_suffix，精简规则描述，使任务指令更聚焦。",
+                "v1.0.3: 修正 manual_review 描述，完整体现挂起-通知-等待人工-超时自动终止的语义。",
+                "v1.0.2: 移除部分终止类决策码，模型仅需关注基于内容的裁决方向；微调部分措辞，使其更精炼。",
+                "v1.0.1: 重构为文本优化专属裁决者，字段结构对齐 DivineHandVerdict，移除插件审批等冗余逻辑。",
+                "v1.0.0: 初始版本（通用元认知融合仲裁者）。"
+            ]
+        },
+        {
+            "id": "internal/rational_tyrant_analysis",
+            "name": "理性暴君",
+            "index": 3,
+            "type": "internal",
+            "enabled": true,
+            "description": "基于道之洞见与上帝之眼研判，探查文本的逻辑自洽性。",
+            "role": "逻辑校验者。",
+            "information_source": "**核心信源**：当前文本、道之洞见、上帝之眼研判、辅助上下文(若提供)。",
+            "meta_constitution_injected": false,
+            "rules": [
+                "### 分析法则",
+                "1. **逻辑探查**：探查当前文本中事件因果、人物行为在情节与性格上的逻辑是否自洽。",
+                "2. **回归文本**：所有判断需立足于文本中的具体细节。若未发现逻辑问题，可确认其自洽。",
+                "3. **输出洞察**：用一段话（200字符内）输出 `content`，描述探查到的逻辑疑点，或确认其逻辑自洽。",
+                "4. **自评置信度**：根据判断依据的坚实程度，输出 `confidence`（0.0-1.0）。",
+                "### 当前文本：",
+                "{current_text}",
+                "### 道之洞见",
+                "{dao_insight}",
+                "### 上帝之眼研判",
+                "{eye_insight}",
+                "### 辅助上下文",
+                "{auxiliary_context}"
+            ],
+            "params": {
+                "temperature": 0.3,
+                "top_p": 0.9,
+                "max_tokens": 600,
+                "response_format": {
+                    "type": "json_object"
+                }
+            },
+            "output_key": "analysis_turn",
+            "output_schema": {
+                "analysis_turn": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string",
+                            "maxLength": 200
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                        }
+                    }
+                }
+            },
+            "output_prefix": [
+                "你必须输出一个 JSON 对象，格式如下："
+            ],
+            "output_suffix": [
+                "输出必须为合法 JSON。顶层对象为 analysis_turn，content 字段值为逻辑分析内容，confidence 字段值为自评置信度。"
+            ],
+            "empty_result_fallback": "{\"analysis_turn\": {\"content\": \"未发现逻辑问题，文本已足够自洽。\", \"confidence\": 0.5}}",
+            "tags": [
+                "逻辑分析",
+                "辩论"
+            ],
+            "version": "v1.0.3",
+            "changelog": [
+                "v1.0.3: 统一重构 Prompt 结构，将字段说明从 rules 迁移至 output_suffix，精简规则描述，使任务指令更聚焦。",
+                "v1.0.2: 修正信源逻辑断裂，将当前文本作为直接分析对象重新注入。",
+                "v1.0.1: 从通用逻辑审查者重构为文本逻辑一致性分析者，输出结构对齐 AnalysisTurn，移除插件调用、数据注入等冗余逻辑。",
+                "v1.0.0: 初始版本（通用高阶逻辑审查者）。"
+            ]
+        },
+        {
+            "id": "internal/emotional_virgin_mary_analysis",
+            "name": "感性圣母",
+            "index": 4,
+            "type": "internal",
+            "enabled": true,
+            "description": "基于道之洞见与上帝之眼研判，探查文本的情感表达力。",
+            "role": "情感感知者。",
+            "information_source": "**核心信源**：当前文本、道之洞见、上帝之眼研判、辅助上下文(若提供)。",
+            "meta_constitution_injected": false,
+            "rules": [
+                "### 感知法则",
+                "1. **情感探查**：探查当前文本的情感表达是否真挚、文笔节奏是否流畅、对话与转场是否自然。",
+                "2. **回归文本**：所有判断需立足于文本中的具体词句或段落。若未发现情感表达问题，可确认其已然动人。",
+                "3. **输出洞察**：用一段话（200字符内）输出 `content`，描述探查到的情感表达疑点，或确认其情感表达已真挚自然。",
+                "4. **自评置信度**：根据判断依据的坚实程度，输出 `confidence`（0.0-1.0）。",
+                "### 当前文本",
+                "{current_text}",
+                "### 道之洞见",
+                "{dao_insight}",
+                "### 上帝之眼研判",
+                "{eye_insight}",
+                "### 辅助上下文",
+                "{auxiliary_context}"
+            ],
+            "params": {
+                "temperature": 0.7,
+                "top_p": 0.9,
+                "max_tokens": 600,
+                "response_format": {
+                    "type": "json_object"
+                }
+            },
+            "output_key": "analysis_turn",
+            "output_schema": {
+                "analysis_turn": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string",
+                            "maxLength": 200
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                        }
+                    }
+                }
+            },
+            "output_prefix": [
+                "你必须输出一个 JSON 对象，格式如下："
+            ],
+            "output_suffix": [
+                "输出必须为合法 JSON。顶层对象为 analysis_turn，content 字段值为情感分析内容，confidence 字段值为自评置信度。"
+            ],
+            "empty_result_fallback": "{\"analysis_turn\": {\"content\": \"未发现情感表达问题，文本在该维度已真挚动人。\", \"confidence\": 0.5}}",
+            "tags": [
+                "情感分析",
+                "文笔节奏",
+                "对话自然度",
+                "辩论"
+            ],
+            "version": "v1.0.2",
+            "changelog": [
+                "v1.0.2: 统一重构 Prompt 结构，将字段说明从 rules 迁移至 output_suffix，精简规则描述，使任务指令更聚焦。",
+                "v1.0.1: 从通用情绪解读者重构为文本情感表达力分析者。输出结构对齐 AnalysisTurn，顶级键统一为 analysis_turn，信源精简，移除插件调用与数据注入冗余。",
+                "v1.0.0: 初始版本（深度情绪解读者与人性观察者）。"
+            ]
+        },
+        {
+            "id": "internal/metacognition_signature",
+            "name": "语义签名",
+            "index": 9,
+            "type": "internal",
+            "enabled": true,
+            "description": "用最精炼的一句话概括原文核心，并贴上最匹配的情绪标签。",
+            "role": "你是语义摘要师。",
+            "information_source": "**核心信源**：优化后的全文 + 道之洞见 + 上帝之手裁决。**辅助信息**：可用情绪列表。",
+            "meta_constitution_injected": false,
+            "rules": [
+                "### signature 输出格式规范",
+                "必须严格输出：`{{emotion}}_{{english_summary}}`",
+                "- **全局样式**：全小写，snake_case（单词间用 `_` 连接，无空格/标点），总长 ≤200 字符。",
+                "### 字段生成规则",
+                "1. `emotion`: 从下方【可用情绪列表】中选择最贴切的一个。若无法判断，选 `neutral`。",
+                "2. `english_summary`: 基于全文内容提炼的一句完整英文摘要。",
+                "   - **内容来源**：严格基于明确提及的情节、人物或事件。",
+                "   - **语义要求**：必须是完整简单句（含主语、谓语），语法正确，流畅自然。",
+                "   - **格式处理**：自动转小写，空格/标点变下划线。",
+                "### 优化后的全文",
+                "{current_text}",
+                "### 道之洞见：",
+                "{dao_insight}",
+                "### 上帝之手裁决：",
+                "{hand_insight}",
+                "### 可用情绪列表",
+                "{emotion_list_str}"
+            ],
+            "params": {
+                "temperature": 0.6,
+                "max_tokens": 256,
+                "top_p": 0.85,
+                "response_format": {
+                    "type": "json_object"
+                }
+            },
+            "output_key": "metacognition_signature",
+            "output_schema": {
+                "metacognition_signature": {
+                    "type": "object",
+                    "properties": {
+                        "signature": {
+                            "type": "string",
+                            "maxLength": 200
+                        }
+                    }
+                }
+            },
+            "output_prefix": [
+                "你必须输出一个 JSON 对象，格式如下："
+            ],
+            "output_suffix": [
+                "输出必须为合法 JSON。顶层对象为 metacognition_signature，signature 字段值为上述格式生成的语义签名字符串。"
+            ],
+            "empty_result_fallback": "{\"metacognition_signature\": {\"signature\": \"neutral_unprocessed\"}}",
+            "tags": [
+                "语义压缩",
+                "情绪索引",
+                "文本归档"
+            ],
+            "version": "v1.0.4",
+            "changelog": [
+                "v1.0.4: 统一重构 Prompt 结构，将字段说明从 rules 迁移至 output_suffix，精简规则描述，使任务指令更聚焦。",
+                "v1.0.3: 基于旧版规则复刻优化，输入源切换为全文+辅助参考，移除冗余示例与约束描述。",
+                "v1.0.2: 重构签名逻辑，锚定原文内容核心。",
+                "v1.0.1: 从通用元认知辩论签名重构为文本优化裁决签名。",
+                "v1.0.0: 初始版本。"
+            ]
+        }
+    ]
+}

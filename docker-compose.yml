@@ -1,0 +1,39 @@
+
+services:
+  psytext:
+    container_name: psytext_analyst
+    build:
+      context: .
+      args:
+        BUILDKIT_PROGRESS: plain
+    image: psytext_analyst:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - /opt/psytext/data:/data
+      - pip_cache:/root/.cache/pip
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    environment:
+      - DOCKER_BUILDKIT=1
+      - XINHAI_STORAGE_BACKEND=redis
+      - XINHAI_REDIS_HOST=redis
+
+    depends_on:
+      - redis
+
+  redis:
+    container_name: psytext_redis
+    image: redis:7-alpine
+    volumes:
+      - psytext_redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  pip_cache:
+  psytext_redis_data:
+    name: psytext_redis_data

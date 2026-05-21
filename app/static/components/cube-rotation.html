@@ -1,0 +1,241 @@
+
+<style>
+@keyframes hue-rotate {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+.cube-rotation .containers {
+  --w: 35px;
+  --g: 5px;
+  --t: calc(var(--w) + var(--g));
+  width: var(--w);
+  aspect-ratio: 1;
+  perspective: 120px;
+  transform-style: preserve-3d;
+}
+
+.cube-rotation .cube {
+  --fz: 0;
+  --rx: 0;
+  --fx: 0;
+  --ry: 0;
+  --fy: 0;
+  position: absolute;
+  background: #fffc;
+  border: 2px solid black;
+  width: var(--w);
+  aspect-ratio: 1;
+  bottom: calc(var(--w) * -0.5);
+  right: calc(var(--w) * -0.5);
+  animation:
+    rotate 20s linear infinite,
+    hue-rotate 20s linear infinite;
+  transition: 5s;
+  --a: translateZ(calc(0.5 * var(--w)))
+    translateX(calc(var(--x) * var(--t) - 0.5 * var(--fy) * var(--w)))
+    translateY(calc(var(--y) * var(--t) - 0.5 * var(--fx) * var(--w)))
+    translateZ(
+      calc(
+        var(--z) * var(--t) - 0.5 * var(--ry) * var(--w) - 0.5 * var(--rx) *
+          var(--w) - var(--fz) * var(--w)
+      )
+    )
+    rotateX(calc(90deg * var(--rx))) rotateY(calc(90deg * var(--ry)));
+  --p: translateX(calc(-0.5 * var(--w))) translateY(calc(-0.5 * var(--w)))
+    translateZ(calc(-0.5 * var(--w)));
+}
+
+.cube-rotation .cube:hover {
+  background: #f00e;
+  transition: 0s;
+}
+
+@keyframes rotate {
+  0% {
+    transform: var(--p) rotateZ(0deg) rotateY(0deg) rotateX(0deg) var(--a);
+  }
+  to {
+    transform: var(--p) rotateZ(360deg) rotateY(720deg) rotateX(360deg) var(--a);
+  }
+}
+</style>
+
+<div style="
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+" class="cube-rotation">
+  <div class="containers">
+    <div class="cube" style="--x:-1;--y:-1;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:-1;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:0;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:-1;--y:1;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:-1;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:0;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:0;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:0;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:0;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:1;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:1;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:0;--y:1;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:0;--y:1;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:-1;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:0;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:0;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:0;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:0;--z:1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:-1;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:1;--z:-1;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:-1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:-1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:-1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:-1;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:0;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:1;--z:0;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:0;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:0;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:0;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:0;--ry:1;--fy:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:1;--fz:0"></div>
+    <div class="cube" style="--x:1;--y:1;--z:1;--fz:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:1;--rx:1;--fx:-1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:1;--rx:1;--fx:1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:1;--ry:1;--fy:-1"></div>
+    <div class="cube" style="--x:1;--y:1;--z:1;--ry:1;--fy:1"></div>
+  </div>
+</div>
+
