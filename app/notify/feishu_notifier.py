@@ -62,9 +62,9 @@ class FeishuNotifier(Notifier):
 
         try:
             response = requests.post(self.webhook_url, data=json.dumps(payload))
-            logger.info(f"🕊️ 飞书消息发送状态：{response.status_code}", module_name=self.CHINESE_NAME)
-            logger.info(f"📩 响应内容：{response.text}", module_name=self.CHINESE_NAME)
+            logger.info(f"飞书消息发送状态：{response.status_code}", module_name=self.CHINESE_NAME)
+            logger.debug(f"飞书响应内容(截断)：{response.text[:200]}", module_name=self.CHINESE_NAME)
             return response.json()
         except Exception as e:
-            logger.error(f"❌ 飞书消息发送失败：{e}", exc_info=True, module_name=self.CHINESE_NAME)
+            logger.error(f"飞书消息发送失败：{e}", exc_info=True, module_name=self.CHINESE_NAME)
             return None

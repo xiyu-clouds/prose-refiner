@@ -56,12 +56,12 @@ class LangSmithConfig:
             os.environ[va.VAL_LANGCHAIN_API_KEY] = self.api_key
             os.environ[va.VAL_LANGCHAIN_PROJECT] = self.project_name
             os.environ[va.VAL_LANGCHAIN_ENDPOINT] = self.endpoint
-            logger.info(f"✅ LangSmith 已启用 | 项目: {self.project_name}")
+            logger.info(f"LangSmith 已启用 | 项目: {self.project_name}")
         elif self.enabled:
-            logger.warning("⚠️ LANGSMITH_ENABLED=true 但未提供 API KEY，LangSmith 将不会启用")
+            logger.warning("LANGSMITH_ENABLED=true 但未提供 API KEY，LangSmith 将不会启用")
             self.enabled = False
         else:
-            logger.info("ℹ️ LangSmith 未启用")
+            logger.info("LangSmith 未启用")
 
     @classmethod
     async def initialize_with_config(cls, config) -> None:

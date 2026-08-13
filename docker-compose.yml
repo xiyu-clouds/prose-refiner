@@ -7,6 +7,14 @@ services:
       args:
         BUILDKIT_PROGRESS: plain
     image: psytext_analyst:latest
+    # Docker stop 信号传递 & 优雅停机（实际行为支撑）：
+    #   - stop_signal: SIGTERM 是 uvicorn 默认监听的终止信号
+    #   - stop_grace_period 90s：给 timeout-graceful-shutdown(60s) + 后续
+    #     lifespan shutdown / WAL checkpoint / 元认知关闭留足余量，避免
+    #     docker 提前发 SIGKILL（发了 SIGKILL 则 shutdown 代码永远不执行）
+    stop_signal: SIGTERM
+    stop_grace_period: 90s
+    init: true
     ports:
       - "8000:8000"
     volumes:

@@ -34,7 +34,7 @@ class WecomNotifier(Notifier):
         if file_path and os.path.exists(file_path):
             self._send_file(file_path)
         elif file_path:
-            logger.error(f"❌ 文件不存在：{file_path}", module_name=self.CHINESE_NAME)
+            logger.error(f"文件不存在：{file_path}", module_name=self.CHINESE_NAME)
 
     def _send_text(self, content: str):
         """发送文本消息"""
@@ -47,17 +47,17 @@ class WecomNotifier(Notifier):
         }
         try:
             response = requests.post(self.webhook_url, json=payload, timeout=10)
-            logger.info(f"💬 文本消息发送状态：{response.status_code}", module_name=self.CHINESE_NAME)
-            logger.info(f"📩 响应内容：{response.text}", module_name=self.CHINESE_NAME)
+            logger.info(f"文本消息发送状态：{response.status_code}", module_name=self.CHINESE_NAME)
+            logger.debug(f"响应内容(截断)：{response.text[:200]}", module_name=self.CHINESE_NAME)
         except Exception as e:
-            logger.error(f"❌ 文本消息发送失败：{e}", exc_info=True, module_name=self.CHINESE_NAME)
+            logger.error(f"文本消息发送失败：{e}", exc_info=True, module_name=self.CHINESE_NAME)
 
     def _send_file(self, file_path: str):
         """上传并发送文件消息"""
         try:
             # 第一步：提取 webhook 中的 key
             if f'{ke.KEY_KEY}=' not in self.webhook_url:
-                logger.error("❌ Webhook URL 缺少 key 参数")
+                logger.error("Webhook URL 缺少 key 参数")
                 return
 
             key = self.webhook_url.split(f'{ke.KEY_KEY}=')[1].split('&')[0]
@@ -72,14 +72,14 @@ class WecomNotifier(Notifier):
 
             result = response.json()
             if result.get(ke.KEY_ERRCODE) != 0:
-                logger.error(f"❌ 文件上传失败：{result.get(ke.KEY_ERRMSG)}", module_name=self.CHINESE_NAME)
+                logger.error(f"文件上传失败：{result.get(ke.KEY_ERRMSG)}", module_name=self.CHINESE_NAME)
                 return
 
             media_id = result.get(ke.KEY_MEDIA_ID)
             if not media_id:
-                logger.error(f"❌ 未获取到 {ke.KEY_MEDIA_ID}", module_name=self.CHINESE_NAME)
+                logger.error(f"未获取到 {ke.KEY_MEDIA_ID}", module_name=self.CHINESE_NAME)
 
-            logger.info(f"✅ 文件上传成功，{ke.KEY_MEDIA_ID}: {media_id}", module_name=self.CHINESE_NAME)
+            logger.info(f"文件上传成功，{ke.KEY_MEDIA_ID}: {media_id}", module_name=self.CHINESE_NAME)
 
             # 第三步：发送文件消息
             payload = {
@@ -93,9 +93,9 @@ class WecomNotifier(Notifier):
             send_result = send_response.json()
 
             if send_result.get(ke.KEY_ERRCODE) == 0:
-                logger.info(f"📎 文件 '{file_name}' 发送成功", module_name=self.CHINESE_NAME)
+                logger.info(f"文件 '{file_name}' 发送成功", module_name=self.CHINESE_NAME)
             else:
-                logger.error(f"❌ 文件发送失败：{send_result.get(ke.KEY_ERRMSG)}", module_name=self.CHINESE_NAME)
+                logger.error(f"文件发送失败：{send_result.get(ke.KEY_ERRMSG)}", module_name=self.CHINESE_NAME)
 
         except Exception as e:
-            logger.error(f"❌ 文件发送异常：{e}", exc_info=True, module_name=self.CHINESE_NAME)
+            logger.error(f"文件发送异常：{e}", exc_info=True, module_name=self.CHINESE_NAME)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import traceback
+from app.common import keys as ke
 from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -78,7 +79,7 @@ class LLMResponse(BaseModel):
     # --------------------------------------------------------------------------
     model: str = Field(default="unknown", description="模型名称：gpt-4o, qwen-max, deepseek-chat")
     vendor: str = Field(default="unknown", description="厂商：openai / qwen / deepseek / anthropic")
-    cost: Dict[str, int] = Field(default_factory=dict, description="tokens 消耗：prompt, completion, total")
+    cost: Dict[str, any] = Field(default_factory=dict, description="tokens 消耗：prompt, completion, total")
     elapsed_ms: float = Field(default=0.0, description="请求耗时（毫秒）")
     created: float = Field(default=0.0, description="创建时间戳")
 
@@ -122,7 +123,7 @@ class LLMResponse(BaseModel):
     def invalid(
             cls,
             errors: List[str],
-            raw: str,
+            content: Any,
             vendor: str,
             model: str,
             msg: str
@@ -130,7 +131,7 @@ class LLMResponse(BaseModel):
         return cls(
             ok=True,
             valid=False,
-            raw=raw,
+            content=content,
             errors=errors,
             err="validation",
             msg=msg,
@@ -160,8 +161,8 @@ class LLMResponse(BaseModel):
     def sys_fail(
             cls,
             msg: str,
-            vendor: str = "unknown",
-            model: str = "unknown",
+            vendor: str = ke.KEY_UNKNOWN,
+            model: str = ke.KEY_UNKNOWN,
             with_stack: bool = True
     ) -> LLMResponse:
         return cls(

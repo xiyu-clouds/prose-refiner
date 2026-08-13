@@ -108,7 +108,7 @@ def before_retry_callback(retry_state: RetryCallState, func_name: str = "", modu
 
         if total_retry_count >= config.GLOBAL_MAX_RETRIES:
             RETRY_ABORT_FLAG[ke.KEY_ABORT] = True
-            logger.error(f"🛑 全局重试已达上限 {config.GLOBAL_MAX_RETRIES}，已中止所有重试 | {ke.KEY_TRACE_ID}={trace_id}", module_name=module_name or "重试机制（前置）",
+            logger.error(f"全局重试已达上限 {config.GLOBAL_MAX_RETRIES}，已中止所有重试 | {ke.KEY_TRACE_ID}={trace_id}", module_name=module_name or "重试机制（前置）",
                          # 可传入业务模块名
                          location=location or f"Retry.{func_name}")
             raise RuntimeError("全局重试已达上限，终止所有重试")
@@ -120,7 +120,7 @@ def before_retry_callback(retry_state: RetryCallState, func_name: str = "", modu
     attempt = retry_state.attempt_number
     exc = retry_state.outcome.exception()
     logger.info(
-        f"🔁 [{func_name}] 第 {attempt} 次重试 | "
+        f"[{func_name}] 第 {attempt} 次重试 | "
         f"{ke.KEY_TRACE_ID}={trace_id} | "
         f"累计重试: {current} | "
         f"全局总计: {total_retry_count} | "
@@ -146,7 +146,7 @@ def after_call_callback(func_name: str, success: bool, module_name: Optional[str
         METRICS[key] += 1
 
     logger.info(
-        f"📊 调用完成: {func_name} | 成功={success} | "
+        f"调用完成: {func_name} | 成功={success} | "
         f"{ke.KEY_TRACE_ID}={trace_id} | "
         f"重试成功累计={METRICS[ke.KEY_SUCCESS_AFTER_RETRY]} | "
         f"重试失败累计={METRICS[ke.KEY_FAILED_AFTER_RETRY]}",
@@ -305,7 +305,7 @@ def reset_retry_counters(
             RETRY_ABORT_FLAG[ke.KEY_ABORT] = False
             LAST_RESET_TIME[0] = time.time()
             logger.info(
-                "✅ 全局重试系统已重置 | 熔断标志已恢复",
+                "全局重试系统已重置 | 熔断标志已恢复",
                 module_name=module_name,
                 location=location or "Retry.reset_counters"
             )
@@ -314,13 +314,13 @@ def reset_retry_counters(
             if func_name in RETRY_COUNTER:
                 count = RETRY_COUNTER.pop(func_name)
                 logger.info(
-                    f"✅ 已清除函数 [{func_name}] 的重试计数（原值: {count}）",
+                    f"已清除函数 [{func_name}] 的重试计数（原值: {count}）",
                     module_name=module_name,
                     location=location or f"Retry.reset_counter:{func_name}"
                 )
             else:
                 logger.debug(
-                    f"🔍 函数 [{func_name}] 无重试记录，无需重置",
+                    f"函数 [{func_name}] 无重试记录，无需重置",
                     module_name=module_name,
                     location=location or f"Retry.reset_counter:{func_name}"
                 )
@@ -331,7 +331,7 @@ def reset_retry_counters(
                 if total < config.GLOBAL_MAX_RETRIES:
                     RETRY_ABORT_FLAG[ke.KEY_ABORT] = False
                     logger.warning(
-                        f"⚠️ 全局重试已恢复：当前总计 {total} < {config.GLOBAL_MAX_RETRIES}",
+                        f"全局重试已恢复：当前总计 {total} < {config.GLOBAL_MAX_RETRIES}",
                         module_name=module_name,
                         location=location
                     )

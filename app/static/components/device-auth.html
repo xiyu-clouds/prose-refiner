@@ -1,0 +1,290 @@
+<style>
+    .device-auth-container {
+      padding: 52px 28px 28px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1f2937;
+      background: #f5f7fa;
+      min-height: 100%;
+      box-sizing: border-box;
+    }
+
+    /* 顶部状态条（不再重复标题，模态窗标题栏已有） */
+    .da-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 18px;
+    }
+    .da-status-badge {
+      padding: 5px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .da-status-badge.ok { background: #dcfce7; color: #15803d; }
+    .da-status-badge.warn { background: #fef3c7; color: #b45309; }
+    .da-status-badge.over { background: #fee2e2; color: #b91c1c; }
+    .da-status-badge.loading { background: #e5e7eb; color: #6b7280; }
+
+    /* 概览卡片 */
+    .da-summary {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 18px 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .da-summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .da-summary-label {
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .da-summary-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .da-summary-value.verdict {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* 超限/未注册提示 */
+    .da-over-limit-notice {
+      display: none;
+      padding: 12px 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      color: #991b1b;
+      font-size: 13px;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .da-over-limit-notice.warn {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    /* 设备列表 */
+    .da-device-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .da-device-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .da-device-card:hover {
+      border-color: #d1d5db;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+    .da-device-card.current {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+    .da-device-card.current:hover {
+      border-color: #4ade80;
+    }
+
+    .da-device-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .da-device-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .da-device-meta {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .da-device-current-tag {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 5px;
+      background: #dcfce7;
+      color: #15803d;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* 右侧操作区 */
+    .da-device-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ID 复制图标按钮（替代原 ID 标签） */
+    .da-id-copy-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #f3f4f6;
+      color: #6b7280;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .da-id-copy-btn:hover {
+      background: #e5e7eb;
+      color: #1f2937;
+      border-color: #d1d5db;
+    }
+    .da-id-copy-btn.copied {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #86efac;
+    }
+    .da-id-copy-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+    /* 悬浮提示 */
+    .da-id-copy-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      right: 0;
+      padding: 4px 8px;
+      background: #1f2937;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+    .da-id-copy-btn:hover::after {
+      opacity: 1;
+    }
+
+    /* 解绑命令复制按钮 */
+    .da-copy-btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+    .da-copy-btn:hover {
+      background: #f3f4f6;
+      color: #111827;
+      border-color: #9ca3af;
+    }
+    .da-copy-btn:active {
+      background: #e5e7eb;
+    }
+    .da-copy-btn.copied {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #86efac;
+    }
+
+    /* 底部提示 */
+    .da-hint {
+      margin-top: 18px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.7;
+    }
+
+    /* 加载/错误/空态 */
+    .da-loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .da-error {
+      text-align: center;
+      padding: 60px 20px;
+      color: #b91c1c;
+      font-size: 14px;
+    }
+    .da-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+  </style>
+
+<!-- device-auth.html — 设备授权查看面板（只读，用户不可自助操作；浅色主题） -->
+<div class="device-auth-container" data-device-auth-init>
+  <!-- 状态徽章已移到概览卡片的"当前状态"列，不再重复显示 -->
+
+  <div id="da-loading" class="da-loading">正在获取授权信息...</div>
+  <div id="da-error" class="da-error" style="display:none;"></div>
+
+  <div id="da-content" style="display:none;">
+    <div class="da-summary">
+      <div class="da-summary-item">
+        <span class="da-summary-label">已用配额</span>
+        <span class="da-summary-value" id="da-used">-</span>
+      </div>
+      <div class="da-summary-item">
+        <span class="da-summary-label">最大配额</span>
+        <span class="da-summary-value" id="da-max">-</span>
+      </div>
+      <div class="da-summary-item">
+        <span class="da-summary-label">当前状态</span>
+        <span class="da-summary-value verdict" id="da-verdict">-</span>
+      </div>
+    </div>
+
+    <div id="da-notice" class="da-over-limit-notice"></div>
+
+    <div id="da-list" class="da-device-list"></div>
+
+    <div class="da-hint">
+      如需解绑旧设备腾出配额，请联系工具包作者协助处理。
+    </div>
+  </div>
+</div>

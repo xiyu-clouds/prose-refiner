@@ -1,983 +1,906 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>心海 · 全息感知基底</title>
-    <link rel="icon" href="/static/favicon.ico" />
-    <link rel="stylesheet" href="/static/css/all.min.css"/>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        background: #f9f9f9;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "PingFang SC", sans-serif;
-        margin: 0;
-        padding: 0;
-        overflow-y: auto;
-        position: relative; /* 为绝对定位按钮提供参考 */
-      }
-
-    .container {
-      width: 1200px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .header {
-      background: linear-gradient(135deg, #4a00e0, #8e2de2);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      border-radius: 8px;
-    }
-
-    .header h2 {
-      font-size: 24px;
-      font-weight: 600;
-      margin: 0;
-    }
-
-      textarea#inputText {
-        width: 100%;
-        min-height: 230px;
-        padding: 20px;
-        font-size: 16px;
-        line-height: 1.6;
-        font-family: "Segoe UI", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
-        background: #ffffff;
-        border: 1px solid #e0e4ec;
-        border-radius: 14px;
-        resize: vertical;
-        box-shadow:
-          0 2px 8px rgba(0, 0, 0, 0.02),
-          inset 0 1px 0 rgba(255, 255, 255, 0.7);
-        transition:
-          border-color 0.3s ease,
-          box-shadow 0.3s ease,
-          transform 0.2s ease;
-        position: relative;
-      }
-
-      textarea#inputText:focus {
-        outline: none;
-        border: 2px solid #5e35b1;
-        box-shadow:
-          0 6px 20px rgba(94, 53, 177, 0.08),
-          0 0 0 2px rgba(94, 53, 177, 0.06),
-          inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        transform: translateY(-1px); /* 微微上浮，暗示“激活” */
-      }
-
-      /* 控制按钮和loader的位置 */
-      .action-panel {
-        position: absolute;
-        bottom: 12px;
-        right: 6px;
-        display: flex;
-        align-items: flex-end;
-        gap: 14px;
-        z-index: 10;
-        height: 52px;
-      }
-      /* 确保两个 loader 底部对齐，且不撑高容器 */
-      #idleLoader,
-      #activeLoader {
-        height: 48px; /* 统一高度 */
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-      }
-
-      #result {
-        display: none;
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        margin-top: 20px;
-        animation: fadeIn 0.4s ease;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      #globalError {
-        margin-top: 24px;
-        padding: 14px;
-        background: #fdf2f2;
-        color: #e74c3c;
-        border-left: 4px solid #e74c3c;
-        border-radius: 6px;
-        font-weight: 500;
-        display: none;
-      }
-
-      .status-box {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 15px 25px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: none;
-        z-index: 1000;
-        animation: slideIn 0.3s ease-out;
-      }
-
-      @keyframes slideIn {
-        from { transform: translateY(100%); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-
-      /* ===== 眼睛 loader (idle) ===== */
-      .eye-loader {
-        position: relative;
-        width: 96px;
-        height: 48px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        opacity: 0.85;
-      }
-      .eye-loader::after,
-      .eye-loader::before {
-        content: "";
-        display: inline-block;
-        width: 48px;
-        height: 48px;
-        background-color: rgba(255, 255, 255, 0.7);
-        background-image: radial-gradient(
-          circle 14px,
-          #0d161b 100%,
-          transparent 0
-        );
-        background-repeat: no-repeat;
-        border-radius: 50%;
-        animation: eyeMove 10s infinite, blink 10s infinite;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-      }
-      @keyframes eyeMove {
-        0%,
-        10% {
-          background-position: 0 0;
-        }
-        13%,
-        40% {
-          background-position: -15px 0;
-        }
-        43%,
-        70% {
-          background-position: 15px 0;
-        }
-        73%,
-        90% {
-          background-position: 0 15px;
-        }
-        93%,
-        100% {
-          background-position: 0 0;
-        }
-      }
-      @keyframes blink {
-        0%,
-        10%,
-        12%,
-        20%,
-        22%,
-        40%,
-        42%,
-        60%,
-        62%,
-        70%,
-        72%,
-        90%,
-        92%,
-        98%,
-        100% {
-          height: 48px;
-        }
-        11%,
-        21%,
-        41%,
-        61%,
-        71%,
-        91%,
-        99% {
-          height: 18px;
-        }
-      }
-
-      /* ===== 咖啡杯 loader (active) ===== */
-      .coffee-loader {
-        width: 100px;
-        height: 48px;
-        position: relative;
-        animation: shake 3s infinite ease-in-out;
-      }
-
-      .cup {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40px;
-        height: 30px;
-        background-color: #5b4022cb;
-        border: 1px solid #2e2e2e;
-        border-radius: 3px 3px 10px 10px;
-        z-index: 1;
-        animation: cupPulse 6s infinite ease-in-out;
-      }
-
-      .cup::before {
-        content: "";
-        position: absolute;
-        bottom: -5px;
-        width: calc(100% - 2px);
-        height: 6px;
-        background: #5b4022cb;
-        border: 1px solid #2e2e2e;
-        border-top: none;
-        border-radius: 50%;
-        z-index: -1;
-        animation: cupPulse 6s infinite ease-in-out;
-      }
-
-      .cup::after {
-        content: "";
-        position: absolute;
-        top: -2px;
-        left: 1px;
-        width: calc(100% - 2px);
-        height: 4px;
-        background: #da8920ca;
-        border: 1px solid #2e2e2e;
-        border-radius: 50%;
-        animation: coffeeGlow 6s infinite ease-in-out;
-      }
-
-      .cup-handle {
-        position: absolute;
-        top: 5px;
-        right: -10px;
-        width: 10px;
-        height: 15px;
-        border: 2px solid #2e2e2e;
-        border-left: none;
-        border-radius: 0 10px 10px 0;
-        background: transparent;
-      }
-
-      .smoke {
-        position: absolute;
-        bottom: 60%;
-        left: 50%;
-        width: 10px;
-        height: 25px;
-        background: rgba(72, 67, 67, 0.501);
-        border-radius: 50%;
-        transform: translateX(-50%);
-        animation: rise 3s infinite ease-in-out;
-        filter: blur(8px);
-      }
-
-      .smoke.one {
-        animation-delay: 0s;
-      }
-      .smoke.two {
-        animation-delay: 0.8s;
-      }
-      .smoke.three {
-        animation-delay: 1.6s;
-      }
-
-      .load-text {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 12px;
-        color: #2e2e2e;
-        opacity: 0.6;
-        white-space: nowrap;
-      }
-
-      @keyframes rise {
-        0% {
-          transform: translate(-50%, 0) scale(0.4);
-          opacity: 0;
-        }
-        30% {
-          opacity: 0.7;
-        }
-        60% {
-          opacity: 0.4;
-        }
-        100% {
-          transform: translate(-50%, -120px) scale(1);
-          opacity: 0;
-        }
-      }
-
-      @keyframes shake {
-        0%, 100% {
-          transform: translateX(0) translateY(0) rotate(0);
-        }
-        25% {
-          transform: translateX(-4px) translateY(-2px) rotate(-2deg);
-        }
-        50% {
-          transform: translateX(0) translateY(0) rotate(0);
-        }
-        75% {
-          transform: translateX(4px) translateY(-2px) rotate(2deg);
-        }
-      }
-
-      @keyframes cupPulse {
-        0%, 100% {
-          background-color: #5b4022cb;
-        }
-        50% {
-          background-color: #f5f5f5bd;
-        }
-      }
-
-      @keyframes coffeeGlow {
-        0%, 100% {
-          background: #da8920ca;
-        }
-        50% {
-          background: #fed197d5;
-        }
-      }
-
-      /* 按钮样式保持不变 */
-      button {
-        --button_radius: 0.6em;
-        --button_color: #e8e8e8;
-        --button_outline_color: #000000;
-        font-size: 17px;
-        font-weight: bold;
-        border: none;
-        cursor: pointer;
-        border-radius: var(--button_radius);
-        background: var(--button_outline_color);
-      }
-
-      .button_top {
-        display: block;
-        box-sizing: border-box;
-        border: 2px solid var(--button_outline_color);
-        border-radius: var(--button_radius);
-        padding: 0.75em 1.5em;
-        background: var(--button_color);
-        color: var(--button_outline_color);
-        transform: translateY(-0.2em);
-        transition: transform 0.1s ease;
-      }
-
-      button:hover .button_top {
-        transform: translateY(-0.33em);
-      }
-
-      button:active .button_top {
-        transform: translateY(0);
-      }
-
-      /* 左下角统一面板内的子元素布局 */
-      #minimized-hints,
-      #task-notifications {
-          display: flex;
-          flex-direction: column-reverse;
-          gap: 4px;
-          max-width: 100%;
-      }
-      .minimized-hint-item {
-          background: rgba(30, 30, 30, 0.85);
-          color: #e0e0e0;
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-size: 12px;
-          line-height: 1.3;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          cursor: pointer;
-          transition: background-color 0.2s ease;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-          max-width: 100%;
-      }
-      .minimized-hint-item:hover {
-          background: rgba(50, 50, 50, 0.95);
-          color: #fff;
-      }
-
-      /* 小说卡片系统 */
-      .novel-cards {
-        margin-top: 40px;
-        display: grid;
-        gap: 24px;
-      }
-
-      .card-section {
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      }
-
-      .card-section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #f0f0f0;
-      }
-
-      .card-section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .card-section-title i {
-        color: #8e2de2;
-      }
-
-      .add-btn {
-        padding: 8px 16px;
-        background: linear-gradient(135deg, #4a00e0, #8e2de2);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-      }
-
-      .add-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(142, 45, 226, 0.3);
-      }
-
-      .cards-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 16px;
-      }
-
-      .card {
-        background: #fafbfc;
-        border: 1px solid #e8eaed;
-        border-radius: 10px;
-        padding: 16px;
-        position: relative;
-        transition: all 0.3s ease;
-      }
-
-      .card:hover {
-        border-color: #8e2de2;
-        box-shadow: 0 4px 12px rgba(142, 45, 226, 0.1);
-      }
-
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 12px;
-      }
-
-      .card-name {
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-      }
-
-      .card-identity {
-        font-size: 13px;
-        color: #8e2de2;
-        margin-top: 4px;
-      }
-
-      .card-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      .card-action-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #999;
-        font-size: 14px;
-        padding: 4px;
-        transition: color 0.2s;
-      }
-
-      .card-action-btn:hover {
-        color: #e74c3c;
-      }
-
-      .card-field {
-        margin-bottom: 12px;
-      }
-
-      .card-field-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #666;
-        margin-bottom: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .card-field-value {
-        font-size: 14px;
-        color: #444;
-        line-height: 1.5;
-      }
-
-      .card-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-
-      .card-tag {
-        background: #e8f0fe;
-        color: #1967d2;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-      }
-
-      /* 模态框样式 */
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 100000;
-      }
-
-      .modal-overlay.active {
-        display: flex;
-      }
-
-      .modal {
-        background: white;
-        border-radius: 12px !important;
-        padding: 0;
-        width: 90%;
-        max-width: 500px;
-        max-height: 85vh;
-        overflow: hidden;
-        animation: modalIn 0.3s ease;
-      }
-
-      .modal-content-wrapper {
-        padding: 28px;
-        max-height: 85vh;
-        overflow-y: auto;
-      }
-
-      @keyframes modalIn {
-        from {
-          opacity: 0;
-          transform: scale(0.9);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      .modal-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-      }
-
-      .modal-close {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #999;
-        line-height: 1;
-      }
-
-      .modal-close:hover {
-        color: #333;
-      }
-
-      .form-group {
-        margin-bottom: 16px;
-      }
-
-      .form-label {
-        display: block;
-        font-size: 14px;
-        font-weight: 500;
-        color: #555;
-        margin-bottom: 6px;
-      }
-
-      .form-label span {
-        color: #e74c3c;
-      }
-
-      .form-input,
-      .form-textarea {
-        width: 100%;
-        padding: 10px 14px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
-
-      .form-input:focus,
-      .form-textarea:focus {
-        outline: none;
-        border-color: #8e2de2;
-        box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.1);
-      }
-
-      .form-textarea {
-        min-height: 80px;
-        resize: vertical;
-      }
-
-      .modal-footer {
-        margin-top: 24px;
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-      }
-
-      .btn-secondary,
-      .btn-primary {
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .btn-secondary {
-        background: #f1f3f4;
-        color: #555;
-        border: none;
-      }
-
-      .btn-secondary:hover {
-        background: #e8eaed;
-      }
-
-      .btn-primary {
-        background: linear-gradient(135deg, #4a00e0, #8e2de2);
-        color: white;
-        border: none;
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(142, 45, 226, 0.3);
-      }
-
-      /* 风格倾向卡片 */
-      .style-card {
-        background: #fafbfc;
-        border: 1px solid #e8eaed;
-        border-radius: 10px;
-        padding: 16px;
-      }
-
-      .style-textarea {
-        width: 100%;
-        min-height: 100px;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        resize: vertical;
-        font-family: inherit;
-      }
-
-      .style-textarea:focus {
-        outline: none;
-        border-color: #8e2de2;
-        box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.1);
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 40px;
-        color: #999;
-      }
-
-      .empty-state i {
-        font-size: 48px;
-        margin-bottom: 12px;
-        display: block;
-      }
-
-      /* SSE 进度日志样式 */
-      .log-box {
-        background-color: #1e1e1e;
-        color: #00ffcc;
-        padding: 16px;
-        height: 450px;
-        overflow-y: auto;
-        border-radius: 10px;
-        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-        font-size: 14px;
-        line-height: 1.5;
-        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
-      }
-
-      .log-line {
-        margin-bottom: 8px;
-        padding-left: 4px;
-        border-left: 2px solid transparent;
-      }
-
-      .log-line.info {
-        color: #00ffcc;
-      }
-
-      .log-line.warning {
-        color: #ffd700;
-        border-left-color: #ffd700;
-      }
-
-      .log-line.error {
-        color: #ff6b6b;
-        border-left-color: #ff6b6b;
-      }
-
-      .log-line.success {
-        color: #4ecdc4;
-        border-left-color: #4ecdc4;
-      }
-
-      /* 滚动条美化 */
-      .log-box::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .log-box::-webkit-scrollbar-track {
-        background: #2a2a2a;
-        border-radius: 4px;
-      }
-
-      .log-box::-webkit-scrollbar-thumb {
-        background-color: #8e2de2;
-        border-radius: 4px;
-      }
-
-      .log-box::-webkit-scrollbar-thumb:hover {
-        background-color: #a855f7;
-      }
-
-      /* 状态指示器 */
-      .status-indicator {
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 500;
-      }
-
-      .status-indicator.success {
-        background-color: rgba(78, 205, 196, 0.15);
-        color: #4ecdc4;
-      }
-
-      .status-indicator.warning {
-        background-color: rgba(255, 215, 0, 0.15);
-        color: #ffd700;
-      }
-
-      .status-indicator.error {
-        background-color: rgba(255, 107, 107, 0.15);
-        color: #ff6b6b;
-      }
-
-      .status-indicator.info {
-        background-color: rgba(142, 45, 226, 0.15);
-        color: #a855f7;
-      }
-    </style>
+    <title>心海 · 铸神</title>
+    <link rel="icon" href="/static/favicon.ico?v={{ app_version|default('3.7') }}" />
+    <link rel="stylesheet" href="/static/css/all.min.css?v={{ app_version|default('3.7') }}"/>
+    <link rel="stylesheet" href="/static/css/novel.css?v={{ app_version|default('3.7') }}">
+    <script defer src="/static/js/vendors/alpine.min.js?v={{ app_version|default('3.7') }}"></script>
   </head>
-  <body x-data>
-    <div id="global-header" style="margin-bottom: 100px"></div>
+<body x-data>
+  <div id="global-header" style="margin-bottom: 100px;"></div>
 
-    <div class="container">
-      <div class="header">
-        <h2>Psytext Analyst - Holographic Perceptual Substrate</h2>
+  <div class="container">
+      <!-- 左侧侧边栏：作品列表与创作入口 -->
+      <aside id="sidebar" class="sidebar">
+          <button id="create-btn-sidebar" class="create-btn-sidebar" onclick="startCreating()">
+              <i class="fas fa-plus"></i>
+              <span class="create-btn-text">创作</span>
+          </button>
+          <div class="sidebar-content" id="sidebarContent">
+              <div class="empty-hint">
+                  <i class="fas fa-book-open"></i>
+                  <span>暂无作品</span>
+              </div>
+          </div>
+          <button id="sidebar-toggle" class="sidebar-toggle" onclick="toggleSidebar()">
+              <i class="fas fa-chevron-left"></i>
+          </button>
+      </aside>
+
+      <!-- 主内容区容器 -->
+      <div class="main-area" id="mainArea">
+          <h2>立基 - 创作设定</h2>
+
+          <!-- 文件上传区域：支持拖拽或点击选择，允许txt/text/md等常规文本文件 -->
+          <div class="upload-section" id="uploadSection">
+              <i class="fas fa-cloud-upload-alt upload-icon"></i>
+              <div class="upload-text">拖拽文件到此处上传</div>
+              <div class="upload-hint">或</div>
+              <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                  <i class="fas fa-plus"></i>
+                  选择文件
+              </button>
+              <input type="file" id="fileInput" accept=".txt,.text,.md,.markdown,text/plain,text/markdown" multiple>
+              <div class="upload-limit">每次最多上传3个文件，每个文件不超过5000字符</div>
+
+              <!-- 已上传文件列表展示区 -->
+              <div class="uploaded-files" id="uploadedFiles"></div>
+          </div>
+
+          <div class="step-actions">
+              <div class="step-actions-inner">
+                  <button class="extract-memories-btn" id="extractMemoriesBtn" onclick="extractMemoriesNow()">
+                      <i class="fas fa-brain"></i>
+                      提取创作设定
+                  </button>
+                  <button class="next-step-btn" id="nextStepBtn" onclick="handleEnterWeave()">
+                      下一步：织网
+                      <i class="fas fa-arrow-right"></i>
+                  </button>
+              </div>
+          </div>
       </div>
-      <div class="textarea-wrapper" style="position: relative; width: 100%; margin-top: 50px;">
+
+      <!-- 织网页面：基础设定 -->
+      <div class="weave-area" id="weaveArea">
+          <h2>织网 - 基础设定</h2>
+
+          <!-- 主要角色管理模块 -->
+          <div class="weave-section">
+              <div class="weave-section-header">
+                  <div class="weave-section-title">
+                      <i class="fas fa-users"></i>
+                      主要角色
+                      <span style="font-size:12px;color:#555;margin-left:8px;font-weight:normal;">（建议精炼关系与自定义属性，避免冗余）</span>
+                  </div>
+                  <button class="add-item-btn" onclick="openCharacterModal()">
+                      <i class="fas fa-plus"></i> 添加角色
+                  </button>
+              </div>
+              <div class="items-list" id="charactersList"></div>
+          </div>
+
+          <!-- 主要时间节点管理模块 -->
+          <div class="weave-section">
+              <div class="weave-section-header">
+                  <div class="weave-section-title">
+                      <i class="fas fa-clock"></i>
+                      主要时间
+                      <span style="font-size:12px;color:#555;margin-left:8px;font-weight:normal;">（建议精炼自定义属性，避免冗余）</span>
+                  </div>
+                  <button class="add-item-btn" onclick="openAddTimeModal()">
+                      <i class="fas fa-plus"></i> 添加时间
+                  </button>
+              </div>
+              <div class="items-list" id="timelinesList"></div>
+          </div>
+
+          <!-- 主要地点管理模块 -->
+          <div class="weave-section">
+              <div class="weave-section-header">
+                  <div class="weave-section-title">
+                      <i class="fas fa-map-marker-alt"></i>
+                      主要地点
+                      <span style="font-size:12px;color:#555;margin-left:8px;font-weight:normal;">（建议精炼自定义属性，避免冗余）</span>
+                  </div>
+                  <button class="add-item-btn" onclick="openAddLocationModal()">
+                      <i class="fas fa-plus"></i> 添加地点
+                  </button>
+              </div>
+              <div class="items-list" id="locationsList"></div>
+          </div>
+
+          <!-- 篇幅标签：单选模式，动态从 label_config 加载 -->
+          <div class="weave-section">
+              <div class="weave-section-header">
+                  <div class="weave-section-title">
+                      <i class="fas fa-file-text"></i>
+                      篇幅
+                  </div>
+                  <button class="add-item-btn" onclick="openAddTagModal('length')">
+                      <i class="fas fa-plus"></i> 添加篇幅
+                  </button>
+              </div>
+              <div class="tag-section">
+                  <div class="tags-container" id="lengthTags"></div>
+              </div>
+          </div>
+
+          <!-- 题材标签：单选模式，动态从 label_config 加载，支持自定义扩展 -->
+          <div class="weave-section">
+              <div class="weave-section-header">
+                  <div class="weave-section-title">
+                      <i class="fas fa-tag"></i>
+                      题材
+                  </div>
+                  <button class="add-item-btn" onclick="openAddTagModal('subject')">
+                      <i class="fas fa-plus"></i> 添加题材
+                  </button>
+              </div>
+              <div class="tag-section">
+                  <div class="tags-container" id="genreTags"></div>
+              </div>
+          </div>
+
+          <!-- 风格标签：多选模式，动态从 label_config 加载，支持自定义扩展 -->
+          <div class="weave-section">
+              <div class="weave-section-header">
+                  <div class="weave-section-title">
+                      <i class="fas fa-palette"></i>
+                      风格
+                  </div>
+                  <button class="add-item-btn" onclick="openAddTagModal('style')">
+                      <i class="fas fa-plus"></i> 添加风格
+                  </button>
+              </div>
+              <div class="tag-section">
+                  <div class="tags-container" id="styleTags"></div>
+              </div>
+          </div>
+
+          <!-- 禁止雷点标签：多选模式，动态从 label_config 加载，支持自定义扩展 -->
+          <div class="weave-section">
+              <div class="weave-section-header">
+                  <div class="weave-section-title">
+                      <i class="fas fa-ban"></i>
+                      禁止雷点
+                  </div>
+                  <div class="add-tag-input">
+                      <input aria-label="" type="text" id="addTabooInput" placeholder="输入新雷点后回车或点添加..."/>
+                      <button class="add-item-btn" onclick="addNewTabooTag()"><i class="fas fa-plus"></i> 添加雷点</button>
+                  </div>
+              </div>
+              <div class="tag-section">
+                  <div class="tags-container" id="tabooTags"></div>
+              </div>
+          </div>
+
+          <button class="next-step-btn" id="nextStepBtnWeave" onclick="handleWeaveNextStep()">
+              下一步：谋篇
+          </button>
+      </div>
+
+      <!-- 谋篇页面：全局剧情设计与多维视图展示 -->
+      <div class="outline-area" id="outlineArea">
+          <h2>谋篇 - 全局剧情设计</h2>
+
+          <!-- 视图类型切换器：角色关系 / 时间线 / 地点层级 -->
+          <div class="type-switcher-wrapper">
+              <div class="type-switcher">
+                  <input type="radio" name="switch" id="charSwitch" checked/>
+                  <label for="charSwitch" class="switch-btn" onclick="switchView('character')">角色关系</label>
+                  <input type="radio" name="switch" id="timeSwitch"/>
+                  <label for="timeSwitch" class="switch-btn" onclick="switchView('timeline')">时间线</label>
+                  <input type="radio" name="switch" id="locSwitch"/>
+                  <label for="locSwitch" class="switch-btn" onclick="switchView('location')">地点层级</label>
+              </div>
+          </div>
+
+          <!-- D3.js 画布容器：采用绝对定位层叠布局，防止视图切换时撑开父级 -->
+          <div class="canvas-container" style="position: relative; width: 100%; height: 600px;">
+              <!-- SVG层(z-index:1)：渲染力导向图节点、连线及渐变定义 -->
+              <svg id="forceGraph" class="force-graph" width="100%" height="600"
+                  style="position: absolute; inset: 0; z-index: 1;">
+                  <defs>
+                      <!-- 角色性别径向渐变 -->
+                      <radialGradient id="maleGradient" cx="30%" cy="30%" r="70%">
+                          <stop offset="0%" stop-color="#667eea"/>
+                          <stop offset="100%" stop-color="#764ba2"/>
+                      </radialGradient>
+                      <radialGradient id="femaleGradient" cx="30%" cy="30%" r="70%">
+                          <stop offset="0%" stop-color="#f093fb"/>
+                          <stop offset="100%" stop-color="#f5576c"/>
+                      </radialGradient>
+                      <!-- 关系类型线性渐变 -->
+                      <linearGradient id="enemyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#ff6b6b"/>
+                          <stop offset="100%" stop-color="#e74c3c"/>
+                      </linearGradient>
+                      <linearGradient id="swornGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#4facfe"/>
+                          <stop offset="100%" stop-color="#00f2fe"/>
+                      </linearGradient>
+                      <linearGradient id="masterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#a18cd1"/>
+                          <stop offset="100%" stop-color="#fbc2eb"/>
+                      </linearGradient>
+                      <linearGradient id="coupleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#ff9a9e"/>
+                          <stop offset="100%" stop-color="#fecfef"/>
+                      </linearGradient>
+                      <linearGradient id="familyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#43e97b"/>
+                          <stop offset="100%" stop-color="#38f9d7"/>
+                      </linearGradient>
+                      <linearGradient id="brotherGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#4facfe"/>
+                          <stop offset="100%" stop-color="#00f2fe"/>
+                      </linearGradient>
+                      <linearGradient id="sisterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#ffecd2"/>
+                          <stop offset="100%" stop-color="#fcb69f"/>
+                      </linearGradient>
+                      <linearGradient id="friendGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#84fab0"/>
+                          <stop offset="100%" stop-color="#8fd3f4"/>
+                      </linearGradient>
+                      <linearGradient id="allyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#4facfe"/>
+                          <stop offset="100%" stop-color="#00f2fe"/>
+                      </linearGradient>
+                      <!-- 默认关系渐变兜底 -->
+                      <linearGradient id="defaultGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#8e2de2"/>
+                          <stop offset="100%" stop-color="#4a00e0"/>
+                      </linearGradient>
+                  </defs>
+              </svg>
+
+              <!-- 模糊遮罩层(z-index:2)：切换非SVG视图时提供背景虚化过渡效果 -->
+              <div id="timelineBlurLayer" style="
+              position: absolute;
+              inset: 0;
+              z-index: 2;
+              margin: 0;
+              padding: 0;
+              border:none;
+              pointer-events: none;
+              backdrop-filter: blur(4px);
+              -webkit-backdrop-filter: blur(4px);
+              display: none;
+            "></div>
+
+              <!-- Canvas层(z-index:3)：用于绘制时间线等高性能自定义图形 -->
+              <canvas id="outlineCanvas" style="
+              position: absolute;
+              inset: 0;
+              z-index: 3;
+              display: none;
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            "></canvas>
+
+              <!-- 地点层级树容器(z-index:3)：与Canvas同级互斥显示，禁用穿透点击 -->
+              <div id="locationContainer" style="
+              position: absolute;
+              inset: 0;
+              z-index: 3;
+              display: none;
+              width: 100%;
+              height: 100%;
+              background: rgba(26, 26, 46, 0.6);
+              pointer-events: none;
+            "></div>
+          </div>
+
+          <!-- 当前视图操作引导提示 -->
+          <div class="canvas-tips" id="canvasTips" style="
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: rgba(26, 26, 46, 0.5);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            margin-bottom: 36px;
+          ">
+              <p id="tipCharacter" style="margin: 0; color: rgba(255, 255, 255, 0.7); font-size: 14px;">拖拽节点调整位置，查看角色关系网络</p>
+              <p id="tipTimeline" style="display: none; margin: 0; color: rgba(255, 255, 255, 0.7); font-size: 14px;">时间线视图：展示故事时间节点的顺序关系</p>
+              <p id="tipLocation" style="display: none; margin: 0; color: rgba(255, 255, 255, 0.7); font-size: 14px;">地点层级视图：展示地点之间的包含关系</p>
+          </div>
+
+          <!-- 核心剧情输入区域：整合提示、文本框、字符统计 -->
+          <div style="
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            background: rgba(255, 255, 255, 0.75);
+            height: 550px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+          ">
+            <div class="outline-section-header" style="
+              margin: 0 0 12px;
+              padding: 0;
+              border: none;
+              background: none;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-shrink: 0;
+            ">
+              <h3 style="
+                margin: 0;
+                font-size: 16px;
+                font-weight: 600;
+                color: #5b21b6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex: 1;
+              ">
+                用一段话描述故事的核心走向，遵循“何时何地 → 谁 → 想做什么？ → 为什么想做？→ 如何做？→ 阻力 → 结局如何？”的逻辑。
+              </h3>
+              <span id="outlineCoreSaveTip" style="
+                font-size: 12px;
+                color: #7c3aed;
+                opacity: 0;
+                transition: opacity 0.3s;
+                margin-right: 12px;
+              ">已自动保存</span>
+              <span id="outlineCharCount" style="
+                font-size: 16px;
+                font-weight: 500;
+                color: #6d28d9;
+              ">
+                <span id="outlineCharCurrent">0</span> / <span id="outlineCharMax">2000</span>
+              </span>
+            </div>
+
+            <div class="textarea-wrapper" style="position: relative; flex: 1; min-height: 0;">
+              <textarea
+                aria-label=""
+                id="outlineText"
+                oninput="handleOutlineTextInput(event)"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  padding: 16px;
+                  border: 1px solid rgba(168, 85, 247, 0.3);
+                  border-radius: 12px;
+                  font-size: 17px;
+                  font-family: inherit;
+                  resize: vertical;
+                  background: rgba(255, 255, 255, 0.9);
+                  color: #333;
+                  box-sizing: border-box;
+                  outline: none;
+                  display: block;
+                "
+                placeholder="请输入故事核心走向..."
+              ></textarea>
+              <div class="action-panel">
+                <div id="outlineEyeLoader" class="eye-loader"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="globalPlotResult" style="
+            display: none;
+            margin-top: 36px;
+            padding: 20px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.75);
+          ">
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 0 0 14px;
+            ">
+              <h3 style="
+                margin: 0;
+                font-size: 16px;
+                font-weight: 600;
+                color: #5b21b6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              ">
+                <span>📝</span>
+                <span>全局剧情</span>
+              </h3>
+              <span id="globalPlotSaveTip" style="
+                font-size: 12px;
+                color: #7c3aed;
+                opacity: 0;
+                transition: opacity 0.3s;
+              ">已自动保存</span>
+            </div>
+            <div style="
+              display: flex;
+              flex-direction: column;
+              gap: 14px;
+            ">
+              <div>
+                <div style="
+                  font-size: 17px;
+                  font-weight: 600;
+                  color: #4c1d95;
+                  margin-bottom: 6px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                ">
+                  <span id="plotLabel">剧情（建议 1200 字内，最大 1500 字）</span>
+                  <span id="plotCountInfo" class="char-counter">0 / 1200</span>
+                </div>
+                <textarea
+                  id="globalPlotText"
+                  rows="8"
+                  placeholder="可直接在此处修改剧情内容，修改后失焦会自动保存..."
+                  style="
+                    width: 100%;
+                    min-height: 200px;
+                    padding: 12px 14px;
+                    border-radius: 10px;
+                    border: 1px solid #e0d2fc;
+                    background: linear-gradient(180deg, rgba(250, 245, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+                    font-size: 18px;
+                    line-height: 1.75;
+                    color: #333;
+                    box-sizing: border-box;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    resize: vertical;
+                    outline: none;
+                    transition: border-color 0.15s, box-shadow 0.15s;
+                    font-family: inherit;
+                  "
+                  onfocus="this.style.borderColor='#8b5cf6'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.12)';"
+                  onblur="this.style.borderColor='#e0d2fc'; this.style.boxShadow='none';"
+                ></textarea>
+              </div>
+              <div>
+                <div style="
+                  font-size: 17px;
+                  font-weight: 600;
+                  color: #4c1d95;
+                  margin-bottom: 6px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                ">
+                  <span id="summaryLabel">摘要（建议 200 字内，最大 300 字）</span>
+                  <span id="summaryCountInfo" class="char-counter">0 / 200</span>
+                </div>
+                <textarea
+                  id="globalPlotSummary"
+                  rows="3"
+                  placeholder="可直接在此处修改剧情摘要内容，修改后失焦会自动保存..."
+                  style="
+                    width: 100%;
+                    min-height: 88px;
+                    padding: 10px 12px;
+                    border-radius: 10px;
+                    border: 1px solid #e0d2fc;
+                    background: linear-gradient(180deg, rgba(250, 245, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+                    font-size: 18px;
+                    line-height: 1.6;
+                    color: #333;
+                    box-sizing: border-box;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    resize: vertical;
+                    outline: none;
+                    transition: border-color 0.15s, box-shadow 0.15s;
+                    font-family: inherit;
+                  "
+                  onfocus="this.style.borderColor='#8b5cf6'; this.style.boxShadow='0 0 0 3px rgba(139, 92, 246, 0.12)';"
+                  onblur="this.style.borderColor='#e0d2fc'; this.style.boxShadow='none';"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-actions" style="margin-top: 28px;">
+            <div class="step-actions-inner">
+              <button
+                id="generatePlotBtn"
+                type="button"
+                class="extract-memories-btn"
+                onclick="generateGlobalPlotDesign()"
+              >
+                <i class="fas fa-magic"></i>
+                生成全局剧情
+              </button>
+              <button class="next-step-btn" id="nextStepBtnOutline" onclick="handleOutlineNextStep()">
+                  下一步：分卷
+                  <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+      </div>
+
+      <!-- 分卷页面：卷纲剧情设计（基于全局剧情拆分多卷结构） -->
+      <div class="volume-area" id="volumeArea">
+          <h2>分卷 - 卷纲剧情设计</h2>
+
+          <div id="volumeGlobalPlotBox" style="
+            margin-top: 28px;
+            padding: 16px 18px;
+            border: 1px solid #e5d4ff;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(250, 245, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+            position: relative;
+          ">
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 10px;
+            ">
+              <div style="font-size: 17px; font-weight: 700; color: #4c1d95; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fas fa-book-open" style="font-size: 12px;"></i>
+                <span>谋篇剧情（只读，修改请切到「谋篇」页）</span>
+              </div>
+              <div id="volumeGlobalPlotCount" class="char-counter">剧情 0 字 / 摘要 0 字</div>
+            </div>
+            <div id="volumeGlobalPlotContent" style="
+              font-size: 17px;
+              line-height: 1.7;
+              color: #3f3f46;
+              white-space: pre-wrap;
+              word-break: break-word;
+              padding: 0 0 8px;
+              margin: 0;
+            "></div>
+            <div id="volumeGlobalSummaryContent" style="
+              padding: 8px 10px;
+              border-radius: 8px;
+              background: rgba(139, 92, 246, 0.08);
+              font-size: 16px;
+              line-height: 1.6;
+              color: #4c1d95;
+              white-space: pre-wrap;
+              word-break: break-word;
+              border-left: 3px solid #a78bfa;
+              display: none;
+            "></div>
+          </div>
+
           <textarea
             aria-label=""
-            id="inputText"
-            placeholder="请输入一段对话或描述文本..."
-          >晨露坠叶间，凉意忽沾襟，鸟欢啼，风舞叶；漫步廊间晓月，满地黄花堆积，过小桥，听流水。风走过，雨走过，笑曳如花；小道里，风诉叶语，絮儿叨叨。百八十步，鸟鹊声起，盈步轻轻，心事重重；光洒下，影班驳，似是而非...</textarea>
+            id="volumeGlobalPlotText"
+            readonly
+            style="display: none;"
+            placeholder="请先在「谋篇」页面生成并保存全局剧情后，再进入本分卷页面..."
+          ></textarea>
 
-          <div class="action-panel">
-            <div id="idleLoader" class="eye-loader"></div>
-            <div id="activeLoader" class="coffee-loader" style="display: none;">
-              <div class="cup">
-                <div class="cup-handle"></div>
-                <div class="smoke one"></div>
-                <div class="smoke two"></div>
-                <div class="smoke three"></div>
+          <div id="volumePlotResult" style="
+            display: none;
+            margin-top: 28px;
+            padding: 20px;
+            border: 1px solid #e5d4ff;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(250, 245, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+          ">
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 0 0 18px;
+              gap: 12px;
+            ">
+              <h3 style="
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+                color: #5b21b6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              ">
+                <span>📘</span>
+                <span>卷纲剧情列表</span>
+              </h3>
+              <div style="display: inline-flex; align-items: center; gap: 12px;">
+                <span id="volumePlotSaveTip" style="
+                  font-size: 12px;
+                  color: #7c3aed;
+                  opacity: 0;
+                  transition: opacity 0.3s;
+                  white-space: nowrap;
+                ">已自动保存</span>
+                <button
+                  id="addVolumeCardBtn"
+                  type="button"
+                  onclick="addVolumeCard()"
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 7px 14px;
+                    border-radius: 6px;
+                    border: 1px solid rgba(139, 92, 246, 0.3);
+                    background: #fff;
+                    color: #6d28d9;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-weight: 600;
+                    transition: background 0.15s;
+                    font-family: inherit;
+                    line-height: 1.2;
+                  "
+                  onmouseover="this.style.background='rgba(139, 92, 246, 0.08)';"
+                  onmouseout="this.style.background='#fff';"
+                >
+                  <i class="fas fa-plus"></i>
+                  <span>添加卷</span>
+                </button>
               </div>
-              <div class="load-text">loading...</div>
             </div>
-            <button id="analyzeBtn" onclick="analyze()">
-              <span class="button_top">开始分析</span>
-            </button>
+            <div id="volumePlotCards" style="
+              display: flex;
+              flex-direction: column;
+              gap: 18px;
+            "></div>
+          </div>
+
+          <div class="step-actions" style="margin-top: 28px;">
+            <div class="step-actions-inner">
+              <button
+                id="generateVolumeBtn"
+                type="button"
+                class="extract-memories-btn"
+                onclick="generateVolumePlotDesign()"
+              >
+                <i class="fas fa-book-open"></i>
+                生成卷纲剧情
+              </button>
+              <button class="next-step-btn" id="nextStepBtnVolume" onclick="handleVolumeNextStep()">
+                  下一步：定章
+                  <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
           </div>
       </div>
 
-      <!-- 小说卡片系统 -->
-      <div class="novel-cards">
-        <!-- 角色设定卡片 -->
-        <div class="card-section">
-          <div class="card-section-header">
-            <h3 class="card-section-title">
-              角色设定 (character_profiles)
-            </h3>
-            <button class="add-btn" data-add-btn="character" onclick="window.NovelCards.addCard('character')">
-              <i class="fas fa-plus"></i> 添加 (0/8)
-            </button>
-          </div>
-          <div class="cards-container" id="characterCards"></div>
-        </div>
+      <!-- 定章页面：章纲剧情设计（基于每卷卷纲拆分章节级事件流） -->
+      <div class="chapter-area" id="chapterArea">
+          <h2>定章 - 章纲剧情设计</h2>
 
-        <!-- 人物关系卡片 -->
-        <div class="card-section">
-          <div class="card-section-header">
-            <h3 class="card-section-title">
-              人物关系 (relationship_map)
-            </h3>
-            <button class="add-btn" data-add-btn="relationship" onclick="window.NovelCards.addCard('relationship')">
-              <i class="fas fa-plus"></i> 添加 (0/8)
-            </button>
+          <div id="chapterVolumeResult" style="
+            display: block;
+            margin-top: 28px;
+            padding: 20px;
+            border: 1px solid #e5d4ff;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(250, 245, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+          ">
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 0 0 18px;
+              gap: 12px;
+            ">
+              <h3 style="
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+                color: #5b21b6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              ">
+                <span>📗</span>
+                <span>章纲剧情列表</span>
+              </h3>
+              <div style="display: inline-flex; align-items: center; gap: 12px;">
+                <span id="chapterGlobalSaveTip" style="
+                  font-size: 12px;
+                  color: #7c3aed;
+                  opacity: 0;
+                  transition: opacity 0.3s;
+                  white-space: nowrap;
+                ">已自动保存</span>
+              </div>
+            </div>
+            <div id="chapterVolumeCards" style="
+              display: flex;
+              flex-direction: column;
+              gap: 22px;
+            "></div>
           </div>
-          <div class="cards-container" id="relationshipCards"></div>
-        </div>
 
-        <!-- 世界观规则卡片 -->
-        <div class="card-section">
-          <div class="card-section-header">
-            <h3 class="card-section-title">
-              世界观规则 (worldview_rules)
-            </h3>
-            <button class="add-btn" data-add-btn="worldview" onclick="window.NovelCards.addCard('worldview')">
-              <i class="fas fa-plus"></i> 添加 (0/8)
-            </button>
+          <div class="step-actions" style="margin-top: 28px; width: 100%; justify-content: stretch;">
+            <div class="step-actions-inner" style="width: 100%; max-width: none; margin: 0;">
+              <button class="next-step-btn" id="nextStepBtnChapter" onclick="handleChapterNextStep()">
+                  下一步：推演
+                  <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
           </div>
-          <div class="cards-container" id="worldviewCards"></div>
-        </div>
-
-        <!-- 风格倾向卡片 -->
-        <div class="card-section">
-          <div class="card-section-header">
-            <h3 class="card-section-title">
-              风格倾向 (style_preference)
-            </h3>
-            <button class="add-btn" data-add-btn="style" onclick="window.NovelCards.addCard('style')">
-              <i class="fas fa-plus"></i> 添加 (0/8)
-            </button>
-          </div>
-          <div class="cards-container" id="styleCards"></div>
-        </div>
-
-        <!-- SSE 进度日志区域 -->
-        <div class="card-section">
-          <div class="card-section-header">
-            <h3 class="card-section-title">
-              <i class="fas fa-terminal"></i>
-              进度日志
-            </h3>
-            <div class="status-indicator" id="sseStatus">❌ 已断开</div>
-          </div>
-          <div class="log-box" id="progressLog">
-            <div class="log-line">[INFO] 等待连接...</div>
-          </div>
-        </div>
       </div>
 
-      <!-- 模态框 -->
-      <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" id="modalContent"></div>
+      <!-- 推演页面：章节事件设计（基于每章章纲生成具体事件链） -->
+      <div class="deduction-area" id="deductionArea">
+          <h2>推演 - 章节事件设计</h2>
+
+          <div id="deductionResult" style="
+            display: block;
+            margin-top: 28px;
+            padding: 20px;
+            border: 1px solid #e5d4ff;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(250, 245, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+          ">
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 0 0 18px;
+              gap: 12px;
+            ">
+              <h3 style="
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+                color: #5b21b6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              ">
+                <span>🧩</span>
+                <span>章节事件链列表</span>
+              </h3>
+              <div style="display: inline-flex; align-items: center; gap: 12px;">
+                <span id="deductionGlobalSaveTip" style="
+                  font-size: 12px;
+                  color: #7c3aed;
+                  opacity: 0;
+                  transition: opacity 0.3s;
+                  white-space: nowrap;
+                ">已自动保存</span>
+              </div>
+            </div>
+            <div id="deductionChapterCards" style="
+              display: flex;
+              flex-direction: column;
+              gap: 22px;
+            "></div>
+          </div>
+
+          <div class="step-actions" style="margin-top: 28px; width: 100%; justify-content: stretch;">
+            <div class="step-actions-inner" style="width: 100%; max-width: none; margin: 0;">
+              <button class="next-step-btn" id="nextStepBtnDeduction" onclick="handleDeductionNextStep()">
+                  下一步：成文
+                  <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
       </div>
 
-      <div id="result"></div>
+      <!-- 成文页面：章节正文生成（基于章纲和事件链生成正文内容） -->
+      <div class="content-area" id="contentArea">
+          <h2>成文 - 章节正文生成</h2>
 
-      <!-- 状态提示 -->
+          <div id="contentResult" style="
+            display: block;
+            margin-top: 28px;
+            padding: 20px;
+            border: 1px solid #e5d4ff;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(250, 245, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+          ">
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 0 0 18px;
+              gap: 12px;
+            ">
+              <h3 style="
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+                color: #5b21b6;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              ">
+                <span>📝</span>
+                <span>章节正文列表</span>
+              </h3>
+              <div style="display: inline-flex; align-items: center; gap: 12px;">
+                <span id="contentGlobalSaveTip" style="
+                  font-size: 12px;
+                  color: #7c3aed;
+                  opacity: 0;
+                  transition: opacity 0.3s;
+                  white-space: nowrap;
+                ">已自动保存</span>
+              </div>
+            </div>
+            <div id="contentChapterCards" style="
+              display: flex;
+              flex-direction: column;
+              gap: 22px;
+            "></div>
+          </div>
+
+          <div class="step-actions" style="margin-top: 28px; width: 100%; justify-content: stretch;">
+            <div class="step-actions-inner" style="width: 100%; max-width: none; margin: 0;">
+              <button class="next-step-btn" id="nextStepBtnContent" onclick="handleContentNextStep()">
+                  完成创作
+              </button>
+            </div>
+          </div>
+      </div>
+
+      <!-- 创建作品模态框：包含标题输入与字数校验 -->
+      <div class="modal-overlay" id="modalOverlay" style="display: none;">
+          <div class="modal" id="modalContent">
+              <div class="modal-content-wrapper">
+                  <div class="modal-header">
+                      <h3 class="modal-title">开始创作</h3>
+                      <button class="modal-close" onclick="closeModal()">×</button>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label">作品名称</label>
+                      <input
+                              aria-label=""
+                              type="text"
+                              id="workTitleInput"
+                              class="form-input"
+                              placeholder="请输入作品名称"
+                              maxlength="12"
+                      />
+                      <span class="char-counter char-counter--right" id="charCount">0 / 12</span>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn-secondary" onclick="closeModal()">取消</button>
+                      <button class="btn-primary" onclick="createWork()">确认创建</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- 全局状态反馈与错误提示容器 -->
       <div id="statusBox" class="status-box"></div>
       <div id="globalError"></div>
-      <!-- 左下角统一容器 -->
-      <div id="left-bottom-panel" style="position: fixed; bottom: 12px; left: 12px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-start; max-width: 200px;">
 
-          <!-- 任务通知区（上方） -->
-          <div id="task-notifications" style="display: flex; flex-direction: column-reverse; gap: 4px; width: 100%; margin-bottom: 30px;"></div>
+  </div>
 
-          <!-- 原有最小化弹窗区（下方） -->
-          <div id="minimized-hints" style="display: flex; flex-direction: column-reverse; gap: 4px; width: 100%;"></div>
-      </div>
-    </div>
+  <!-- 左下角固定面板：统一管理任务通知与最小化提示弹窗 -->
+  <div id="left-bottom-panel"
+      style="position: fixed; bottom: 12px; left: 12px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-start;">
 
-    <div id="global-footer" style="margin-top: 50px"></div>
+      <!-- 任务通知队列：新消息从底部向上堆叠 -->
+      <div id="task-notifications"
+          style="display: flex; flex-direction: column-reverse; gap: 4px; width: 100%; margin-bottom: 30px; max-width: 200px;"></div>
 
-    <script src="/static/js/axios.min.js" defer></script>
-    <script src="/static/js/header.js" defer></script>
-    <script src="/static/js/utils.js" defer></script>
-    <script src="/static/js/footer.js" defer></script>
-    <script src="/static/js/contextMenu.js" defer></script>
-    <script src="/static/js/scrollButtons.js" defer></script>
-    <script src="/static/js/taskNotifications.js" defer></script>
-    <script src="/static/js/novelCards.js" defer></script>
-    <script src="/static/js/novel.js" defer></script>
-    <script src="/static/js/alpine.min.js" defer></script>
-  </body>
+      <!-- 最小化提示队列：新消息从底部向上堆叠 -->
+      <div id="minimized-hints"></div>
+  </div>
+
+  <div id="global-footer" style="margin-top: 80px;"></div>
+
+  <script src="/static/js/vendors/axios.min.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/utils/utils.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/utils/header.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/utils/footer.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/utils/contextMenu.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/vendors/d3.min.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/utils/taskNotifications.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/utils/scrollButtons.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/novel/core/injection-preview.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/novel/novel.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/utils/terminal.js?v={{ app_version|default('3.6') }}" defer></script>
+  <script src="/static/js/vendors/alpine.min.js?v={{ app_version|default('3.6') }}" defer></script>
+</body>
 </html>

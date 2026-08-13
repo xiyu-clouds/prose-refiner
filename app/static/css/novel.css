@@ -1,0 +1,2719 @@
+/* ============================================ */
+/* 1. 全局基础重置与排�?                         */
+/* ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f9f9f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "PingFang SC", sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    position: relative;
+    font-size: 17px;
+}
+
+.container {
+    width: 100%;
+    margin: 0 auto;
+    min-height: 800px;
+    position: relative;
+    padding-left: 0;
+    transition: padding-left 0.3s ease;
+}
+
+.sidebar.collapsed ~ .main-area,
+.sidebar.collapsed ~ .weave-area,
+.sidebar.collapsed ~ .outline-area,
+.sidebar.collapsed ~ .volume-area,
+.sidebar.collapsed ~ .chapter-area,
+.sidebar.collapsed ~ .deduction-area,
+.sidebar.collapsed ~ .content-area {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+}
+
+/* ============================================ */
+/* 2. 通用组件：按钮系�?                        */
+/* ============================================ */
+
+button {
+    --button_radius: 0.6em;
+    --button_color: #e8e8e8;
+    --button_outline_color: #000000;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--button_radius);
+    background: var(--button_outline_color);
+}
+
+.button_top {
+    display: block;
+    box-sizing: border-box;
+    border: 2px solid var(--button_outline_color);
+    border-radius: var(--button_radius);
+    padding: 0.75em 1.5em;
+    background: var(--button_color);
+    color: var(--button_outline_color);
+    transform: translateY(-0.2em);
+    transition: transform 0.1s ease;
+}
+
+button:hover .button_top {
+    transform: translateY(-0.33em);
+}
+
+button:active .button_top {
+    transform: translateY(0);
+}
+
+/* ============================================ */
+/* 3. 表单输入组件                              */
+/* ============================================ */
+
+textarea#inputText {
+    width: 100%;
+    min-height: 230px;
+    padding: 20px;
+    font-size: 19px;
+    line-height: 1.6;
+    font-family: "Segoe UI", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #e0e4ec;
+    border-radius: 14px;
+    resize: vertical;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+    position: relative;
+}
+
+textarea#inputText:focus {
+    outline: none;
+    border: 2px solid #5e35b1;
+    box-shadow: 0 6px 20px rgba(94, 53, 177, 0.08),
+    0 0 0 2px rgba(94, 53, 177, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    transform: translateY(-1px);
+}
+
+.form-select {
+    padding: 10px 14px;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+    font-size: 17px;
+    background: rgba(26, 26, 46, 0.5);
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    min-width: 150px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.char-count {
+    font-size: 15px;
+    color: #999;
+    margin-top: 6px;
+    text-align: right;
+}
+
+/* ============================================ */
+/* 4. 状态与提示组件                            */
+/* ============================================ */
+
+#idleLoader,
+#activeLoader {
+    height: 48px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+#result {
+    display: none;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#globalError {
+    margin-top: 24px;
+    padding: 14px;
+    background: #fdf2f2;
+    color: #e74c3c;
+    border-left: 4px solid #e74c3c;
+    border-radius: 6px;
+    font-weight: 500;
+    display: none;
+}
+
+.status-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.status-indicator {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-indicator.success {
+    background-color: rgba(78, 205, 196, 0.15);
+    color: #4ecdc4;
+}
+
+.status-indicator.warning {
+    background-color: rgba(255, 215, 0, 0.15);
+    color: #ffd700;
+}
+
+.status-indicator.error {
+    background-color: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+}
+
+.status-indicator.info {
+    background-color: rgba(142, 45, 226, 0.15);
+    color: #a855f7;
+}
+
+#minimized-hints,
+#task-notifications {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 4px;
+    max-width: 100%;
+}
+
+.minimized-hint-item {
+    background: rgba(30, 30, 30, 0.85);
+    color: #e0e0e0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+}
+
+.minimized-hint-item:hover {
+    background: rgba(50, 50, 50, 0.95);
+    color: #fff;
+}
+
+/* ============================================ */
+/* 5. 模态框组件                                */
+/* ============================================ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px !important;
+    padding: 0;
+    width: 90%;
+    max-width: 760px;
+    max-height: 85vh;
+    overflow: hidden;
+    animation: modalIn 0.3s ease;
+}
+
+/* 创作模态窗专用：只有单个作品名输入�?�?收窄到紧凑尺�?
+ * 其他复杂表单（地�?时间/编织预览等）�?#workTitleInput，保持默�?760px �?*/
+.modal:has(#workTitleInput),
+.modal:has(.edit-title-input) {
+    max-width: 440px;
+}
+
+.modal-content-wrapper {
+    padding: 28px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-content-wrapper .form-input,
+.modal-content-wrapper .form-textarea,
+.modal-content-wrapper .form-select {
+    background: rgba(255, 255, 255, 0.94) !important;
+    color: #333 !important;
+    border-color: #d0d0d0 !important;
+}
+
+.modal-content-wrapper .char-counter {
+    color: #6d28d9 !important;
+}
+
+.modal-content-wrapper .modal-title {
+    color: #333 !important;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-item-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.form-label span {
+    color: #e74c3c;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+    font-size: 15px;
+    background: rgba(26, 26, 46, 0.5);
+    color: rgba(255, 255, 255, 0.85);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+.form-textarea.weave-identity {
+    min-height: 84px;
+}
+.form-textarea.weave-secret {
+    min-height: 160px;
+}
+.form-textarea.weave-aliases {
+    min-height: 84px;
+}
+.form-textarea.weave-timeline-desc {
+    min-height: 140px;
+}
+.form-textarea.weave-location-desc {
+    min-height: 180px;
+}
+
+.char-counter {
+    font-size: 16px;
+    color: #6d28d9;
+    font-weight: 400;
+    user-select: none;
+    white-space: nowrap;
+    opacity: 0.85;
+}
+.char-counter--right {
+    display: block;
+    margin-top: 4px;
+    text-align: right;
+    pointer-events: none;
+}
+.char-counter--inline {
+    display: inline-block;
+    margin-left: auto;
+    pointer-events: none;
+}
+.char-counter--inside {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    pointer-events: none;
+    z-index: 3;
+    line-height: 1.5;
+}
+.char-counter--row-right {
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 3;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+.char-counter--row-inside {
+    position: absolute !important;
+    right: 12px !important;
+    bottom: 8px !important;
+    z-index: 9999 !important;
+    pointer-events: none !important;
+    font-size: 15px !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    line-height: 1.5 !important;
+    white-space: nowrap !important;
+}
+.char-counter--over,
+.char-counter.char-counter--over {
+    color: #b91c1c;
+}
+
+
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-row:has(.gender-col) {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+.gender-col {
+    width: 60px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.gender-col select.form-select {
+    width: 100%;
+    min-width: auto;
+    max-width: 60px;
+}
+
+.identity-col {
+    flex: 1;
+}
+
+.form-row-full {
+    margin-bottom: 16px;
+}
+
+.form-row-flex {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.form-row-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.modal-footer {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-secondary,
+.btn-primary {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary {
+    background: #f1f3f4;
+    color: #555;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background: #e8eaed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4a00e0, #8e2de2);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(142, 45, 226, 0.3);
+}
+
+/* ============================================ */
+/* 6. 侧边栏组�?                               */
+/* ============================================ */
+
+.sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 250px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    opacity: 0.7;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transition: width 0.3s ease;
+    backdrop-filter: blur(10px);
+    overflow: visible;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.sidebar.collapsed .empty-hint {
+    display: none;
+}
+
+.create-btn-sidebar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.create-btn-sidebar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(102, 126, 234, 0.5);
+}
+
+.create-btn-sidebar i {
+    font-size: 14px;
+}
+
+.sidebar.collapsed .create-btn-sidebar {
+    right: 50%;
+    transform: translateX(50%);
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 0;
+    background: transparent;
+}
+
+.sidebar.collapsed .create-btn-sidebar i {
+    font-size: 20px;
+    color: #a855f7;
+}
+
+.sidebar.collapsed .create-btn-sidebar:hover {
+    transform: translateX(50%) scale(1.1);
+    background: transparent;
+    box-shadow: none;
+}
+
+.sidebar.collapsed .create-btn-text {
+    display: none;
+}
+
+.create-btn-sidebar:hover::after {
+    content: '创作';
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.7);
+    color: #333;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid #eee;
+}
+
+.sidebar-content {
+    padding: 50px 0 16px;
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.empty-hint {
+    text-align: center;
+    padding: 40px 16px;
+    color: rgba(255, 255, 255, 0.5);
+    width: 100%;
+}
+
+.empty-hint i {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.25);
+    margin-bottom: 16px;
+    display: block;
+}
+
+.empty-hint span {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.empty-hint p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0;
+}
+
+.work-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 8px;
+}
+
+.work-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    cursor: default;
+    position: relative;
+}
+
+.work-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    position: relative;
+}
+
+.work-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.work-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.work-action-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.work-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.work-action-btn.edit-btn:hover {
+    background: rgba(41, 128, 185, 0.18);
+    color: #2980b9;
+}
+
+.work-action-btn.delete-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.expand-icon {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.work-steps {
+    display: none;
+    padding: 0 8px 8px;
+    gap: 2px;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.step-num {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 11px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.step-name {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.step-status {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.step-locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.step-locked .step-num {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.step-active {
+    background: rgba(168, 85, 247, 0.2);
+}
+
+.step-active .step-num {
+    background: #a855f7;
+    color: #fff;
+}
+
+.step-active .step-status {
+    color: #a855f7;
+}
+
+.step-current {
+    background: rgba(168, 85, 247, 0.35);
+}
+
+.step-current .step-num {
+    background: #c084fc;
+    color: #fff;
+}
+
+.step-completed {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+.step-completed .step-num {
+    background: #22c55e;
+    color: #fff;
+}
+
+.step-completed .step-status {
+    color: #22c55e;
+}
+
+.work-item-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+    color: #a855f7;
+}
+
+.work-item-name {
+    font-size: 16px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.sidebar.collapsed .work-item-name {
+    display: none;
+}
+
+.sidebar.collapsed .expand-icon {
+    display: none;
+}
+
+.sidebar.collapsed .work-actions {
+    display: none;
+}
+
+.sidebar.collapsed .work-header {
+    justify-content: center;
+    padding: 8px 0;
+    margin: 0;
+    width: 100%;
+}
+
+.sidebar.collapsed .work-item-icon {
+    margin: 0 auto;
+}
+
+.sidebar.collapsed .work-steps {
+    display: none !important;
+}
+
+.sidebar:not(.collapsed) .work-header {
+    justify-content: flex-start;
+}
+
+.sidebar.collapsed .work-item:hover::after {
+    content: attr(data-title);
+    position: fixed;
+    left: 68px;
+    top: auto;
+    transform: none;
+    background: rgba(255, 255, 255, 0.7);
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid #eee;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.5);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.sidebar-toggle:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.6);
+}
+
+.sidebar.collapsed .sidebar-toggle i {
+    transform: rotate(180deg);
+}
+
+.sidebar-toggle i {
+    transition: transform 0.3s ease;
+    font-size: 14px;
+}
+
+/* ============================================ */
+/* 7. 卡片系统                                  */
+/* ============================================ */
+
+.novel-cards {
+    margin-top: 40px;
+    display: grid;
+    gap: 24px;
+}
+
+.add-btn {
+    padding: 8px 16px;
+    background: rgba(168, 85, 247, 0.15);
+    color: #6d28d9;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    line-height: 1.2;
+}
+
+.add-btn:hover {
+    background: rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.4);
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.card:hover {
+    border-color: rgba(168, 85, 247, 0.3);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.card-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-identity {
+    font-size: 13px;
+    color: #6d28d9;
+    margin-top: 4px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.card-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 14px;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.card-action-btn:hover {
+    color: #ff6b6b;
+}
+
+.card-field {
+    margin-bottom: 12px;
+}
+
+.card-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-field-value {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.card-tag {
+    background: rgba(168, 85, 247, 0.15);
+    color: #6d28d9;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.style-card {
+    background: #fafbfc;
+    border: 1px solid #d0d0d0;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.style-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.style-textarea:focus {
+    outline: none;
+    border-color: #8e2de2;
+    box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.1);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.6);
+    grid-column: 1 / -1;
+}
+
+.empty-state i {
+    font-size: 56px;
+    margin-bottom: 16px;
+    display: block;
+    color: rgba(168, 85, 247, 0.4);
+}
+
+.empty-state p {
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ============================================ */
+/* 8. SSE 进度日志                              */
+/* ============================================ */
+
+.log-box {
+    background-color: #1e1e1e;
+    color: #00ffcc;
+    padding: 16px;
+    height: 450px;
+    overflow-y: auto;
+    border-radius: 10px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.log-line {
+    margin-bottom: 8px;
+    padding-left: 4px;
+    border-left: 2px solid transparent;
+}
+
+.log-line.info {
+    color: #00ffcc;
+}
+
+.log-line.warning {
+    color: #ffd700;
+    border-left-color: #ffd700;
+}
+
+.log-line.error {
+    color: #ff6b6b;
+    border-left-color: #ff6b6b;
+}
+
+.log-line.success {
+    color: #4ecdc4;
+    border-left-color: #4ecdc4;
+}
+
+.log-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.log-box::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.log-box::-webkit-scrollbar-thumb {
+    background-color: #8e2de2;
+    border-radius: 4px;
+}
+
+.log-box::-webkit-scrollbar-thumb:hover {
+    background-color: #a855f7;
+}
+
+/* ============================================ */
+/* 9. 文件上传区域                              */
+/* ============================================ */
+
+.main-area {
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    padding: 50px 50px 150px 50px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    align-items: stretch;
+    position: relative;
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.main-area h2 {
+    text-align: left;
+    width: 100%;
+    color: white;
+    font-size: 27px;
+    font-weight: 600;
+    margin: 0 0 30px;
+    padding: 20px 50px 20px 30px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.upload-section {
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 12px;
+    padding: 60px 50px;
+    min-height: 380px;
+    width: 100%;
+    border: 2px dashed rgba(168, 85, 247, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.upload-section:hover,
+.upload-section.dragover {
+    border-color: #a855f7;
+}
+
+.upload-icon {
+    font-size: 56px;
+    color: rgba(168, 85, 247, 0.6);
+    margin-top: 20px;
+}
+
+.upload-text {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.upload-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.5);
+}
+
+#fileInput {
+    display: none;
+}
+
+.uploaded-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+    align-items: flex-start;
+    padding: 16px 20px 0;
+    margin-top: 16px;
+    border-top: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.file-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    width: calc(33.33% - 8px);
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.file-icon {
+    font-size: 32px;
+    color: rgba(255, 255, 255, 0.7);
+    flex-shrink: 0;
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+    margin-right: 8px;
+}
+
+.file-name {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    word-break: break-all;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.file-card .file-remove {
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+.file-size {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.file-remove {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.file-remove:hover {
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
+}
+
+.upload-limit {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 10px;
+}
+
+/* ---------- 会话记忆区（表格版） ---------- */
+.memories-section {
+    width: 100%;
+    margin-top: 50px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.memories-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.memories-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.memories-title i {
+    color: #6d28d9;
+    font-size: 22px;
+}
+
+.memories-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 26px;
+    padding: 0 12px;
+    background: rgba(168, 85, 247, 0.15);
+    color: #333;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.memories-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: rgba(168, 85, 247, 0.15);
+    color: #6d28d9;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s;
+    font-family: inherit;
+    line-height: 1.2;
+}
+
+.memories-add-btn:hover {
+    background: rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.4);
+}
+
+.memories-list {
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.memories-list .empty-hint {
+    padding: 20px 16px;
+    color: #666;
+}
+
+.memory-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.memory-id-cell {
+    width: 10%;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+.memory-content-cell {
+    width: 75%;
+    font-size: 17px;
+    line-height: 1.7;
+    color: #222;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    text-align: left;
+    min-width: 0;
+    flex: 1;
+}
+
+.memory-content-cell-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+.memory-char-counter {
+    font-size: 12px;
+    color: #6d28d9;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.memory-actions-cell {
+    width: 15%;
+    text-align: left;
+}
+
+.memory-header-row {
+    background: transparent;
+}
+
+.memory-header-row th {
+    padding: 12px 10px;
+    background: transparent;
+    color: #333;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    text-align: left;
+}
+
+.memory-header-row th:first-child {
+    text-align: left;
+}
+
+.memory-header-row th:nth-child(2) {
+    text-align: left;
+}
+
+.memory-header-row th:last-child {
+    text-align: left;
+}
+
+.memory-row {
+    transition: background-color 0.2s ease;
+}
+
+.memory-row + .memory-row td {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.memory-row:hover {
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.memory-row td {
+    padding: 14px 12px;
+    vertical-align: middle;
+}
+
+/* 记忆行操作列：复�?sidebar .work-action-btn 图标样式（白底反色） */
+.memory-row-actions.work-actions {
+    justify-content: center;
+    gap: 10px;
+}
+
+.memory-row-actions .work-action-btn {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.memory-row-actions .work-action-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: #444;
+}
+
+.memory-row-actions .work-action-btn.edit-btn:hover {
+    background: rgba(41, 128, 185, 0.18);
+    color: #2980b9;
+}
+
+.memory-row-actions .work-action-btn.delete-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+/* ---------- inline 就地编辑模式 ---------- */
+.memory-content-cell textarea.memory-inline-editor {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #b0b8d0;
+    border-radius: 8px;
+    font-size: 15px;
+    line-height: 1.7;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    font-family: inherit;
+    color: #222;
+    background: rgba(252, 252, 255, 0.7);
+    box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.08);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.memory-content-cell textarea.memory-inline-editor:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.18);
+}
+
+.memory-inline-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.memory-inline-save,
+.memory-inline-cancel {
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+    transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+.memory-inline-save {
+    background: linear-gradient(135deg, #4a00e0, #8e2de2);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(142, 45, 226, 0.3);
+}
+.memory-inline-save:hover { filter: brightness(1.05); box-shadow: 0 2px 12px rgba(142, 45, 226, 0.36); }
+.memory-inline-cancel {
+    background: #eef0f4;
+    color: #555;
+}
+.memory-inline-cancel:hover { background: #e2e6ee; }
+
+.memory-row.editing { background: rgba(106, 17, 203, 0.08); }
+
+.memories-list .empty-hint i {
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: rgba(168, 85, 247, 0.5);
+}
+
+/* ---------- 通用：next-step-btn 默认隐藏 / show 类显�?---------- */
+.next-step-btn {
+    display: none;
+}
+
+.next-step-btn.show {
+    display: block;
+}
+
+/* ---------- 立基底部动作区：提取 + 进入织网（双按钮并排60%宽） ---------- */
+.step-actions {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-actions-inner {
+    width: 60%;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.step-actions-inner > button {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* ---------- 提取 / 下一步织�?/ 下一步谋篇：统一样式（颜色、字体，不含 display�?---------- */
+.extract-memories-btn,
+.step-actions .next-step-btn,
+.weave-area .next-step-btn.show,
+.outline-area .next-step-btn.show,
+.volume-area .next-step-btn.show,
+.chapter-area .next-step-btn.show,
+.next-step-btn.show {
+    padding: 14px 22px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.85), rgba(118, 75, 162, 0.85));
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    transition: box-shadow 0.15s ease, filter 0.15s ease;
+    text-align: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+/* hover 统一样式 */
+.extract-memories-btn:hover,
+.step-actions .next-step-btn:hover,
+.weave-area .next-step-btn.show:hover,
+.outline-area .next-step-btn.show:hover,
+.volume-area .next-step-btn.show:hover,
+.chapter-area .next-step-btn.show:hover,
+.next-step-btn.show:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.45);
+}
+
+/* disabled 统一样式 */
+.extract-memories-btn:disabled,
+.step-actions .next-step-btn:disabled,
+.weave-area .next-step-btn.show:disabled,
+.outline-area .next-step-btn.show:disabled,
+.volume-area .next-step-btn.show:disabled,
+.chapter-area .next-step-btn.show:disabled,
+.next-step-btn.show:disabled {
+    filter: grayscale(0.4) brightness(0.9);
+    opacity: 0.65;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* ---------- 立基场景：两个按钮用 inline-flex 让图�?文字居中对齐 ---------- */
+.step-actions .extract-memories-btn,
+.step-actions .next-step-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* ---------- 织网/谋篇/分卷/定章场景：单按钮独占整行、同主体内容区全�?---------- */
+.weave-area .next-step-btn.show,
+.outline-area .next-step-btn.show,
+.volume-area .next-step-btn.show,
+.chapter-area .next-step-btn.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100% !important;
+    max-width: 100%;
+    margin: 10px 0 0 0;
+}
+
+.step-actions-hint {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.6;
+}
+
+/* ============================================ */
+/* 10. 织网页面样式                            */
+/* ============================================ */
+
+.weave-area {
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    padding: 50px 50px 150px 50px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    align-items: stretch;
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.weave-area h2 {
+    text-align: left;
+    width: 100%;
+    color: white;
+    font-size: 27px;
+    font-weight: 600;
+    margin: 0 0 30px;
+    padding: 20px 50px 20px 30px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.weave-section {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.weave-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(168, 85, 247, 0.15);
+}
+
+.weave-section-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.weave-section-title i {
+    color: #6d28d9;
+}
+
+.add-item-btn {
+    padding: 8px 16px;
+    background: rgba(168, 85, 247, 0.15);
+    color: #6d28d9;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    line-height: 1.2;
+}
+
+.add-item-btn:hover {
+    background: rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.4);
+}
+
+.items-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.item-card {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.item-card:hover {
+    border-color: rgba(168, 85, 247, 0.3);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.item-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+}
+
+.item-type {
+    font-size: 13px;
+    color: #6d28d9;
+    background: rgba(168, 85, 247, 0.15);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.item-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 14px;
+    padding: 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.item-action-btn:hover {
+    background: rgba(168, 85, 247, 0.15);
+    color: #6d28d9;
+}
+
+.item-action-btn.delete-btn:hover {
+    background: rgba(255, 107, 107, 0.12);
+    color: #ff6b6b;
+}
+
+.item-properties {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.property-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.property-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6d28d9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(168, 85, 247, 0.15);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.property-value {
+    font-size: 16px;
+    color: #333;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+.aliases-tag {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.alias-tag {
+    background: rgba(168, 85, 247, 0.15);
+    color: #6d28d9;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.alias-tag .remove-alias {
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.alias-tag .remove-alias:hover {
+    color: #d32f2f;
+}
+
+.attribute-row {
+    display: flex !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    gap: 14px !important;
+    align-items: center !important;
+    margin-bottom: 16px !important;
+}
+
+.attribute-row .form-input {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.attribute-row .form-input:first-child {
+    flex: 0 0 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+    width: 180px !important;
+}
+
+.attribute-value-wrap {
+    position: relative !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+}
+
+.attribute-value-wrap > textarea.form-input {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 10px 10px 30px 10px !important;
+}
+
+.attribute-remove-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    width: 36px !important;
+    height: 36px !important;
+    flex: 0 0 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.attribute-remove-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.attribute-remove-btn i {
+    font-size: 16px;
+}
+
+.attribute-add-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: rgba(245, 245, 245, 0.7);
+    border: 1px dashed #ddd;
+    border-radius: 6px;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+}
+
+.attribute-add-btn:hover {
+    background: rgba(240, 240, 240, 0.7);
+    border-color: #8e2de2;
+    color: #8e2de2;
+}
+
+.attribute-row textarea.form-input {
+    height: 80px !important;
+    min-height: 80px !important;
+    max-height: 80px !important;
+    resize: none !important;
+    line-height: 1.5 !important;
+    box-sizing: border-box !important;
+}
+.attribute-row > textarea.form-input:first-child,
+.attribute-value-wrap > textarea.form-input {
+    height: 80px !important;
+    min-height: 80px !important;
+    max-height: 80px !important;
+    resize: none !important;
+    display: block !important;
+}
+
+.tag-section {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.tag-item {
+    background: transparent;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #d0d0d0;
+}
+
+.tag-item.selected {
+    background: rgba(59, 130, 246, 0.15);
+    color: #1d4ed8;
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.tag-item:hover {
+    border-color: rgba(59, 130, 246, 0.6);
+}
+
+.add-tag-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.add-tag-input input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.add-tag-input button {
+    padding: 8px 16px;
+    background: rgba(168, 85, 247, 0.15);
+    color: #6d28d9;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    line-height: 1.2;
+}
+
+.add-tag-input button:hover {
+    background: rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.4);
+}
+
+/* ============================================ */
+/* 11. 谋篇页面样式                            */
+/* ============================================ */
+
+.outline-area {
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    padding: 50px 50px 150px 50px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    align-items: stretch;
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.outline-area h2 {
+    text-align: left;
+    width: 100%;
+    color: white;
+    font-size: 27px;
+    font-weight: 600;
+    margin: 0 0 30px;
+    padding: 20px 50px 20px 30px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.type-switcher-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.type-switcher {
+    --bg: rgba(30, 30, 40, 0.7);
+    --text: #e5e5e5;
+    display: flex;
+    position: relative;
+    background: var(--bg);
+    border-radius: 1rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: inset 1px 1px 4px rgba(255, 255, 255, 0.2),
+    inset -1px -1px 6px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    padding: 0;
+    width: 300px;
+    height: 44px;
+}
+
+.type-switcher input {
+    display: none;
+}
+
+.switch-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    font-size: 14px;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--text);
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    white-space: nowrap;
+    border-radius: 1rem;
+    background: transparent;
+    border: none;
+}
+
+/* ============================================ */
+/* 12. 分卷页面样式                            */
+/* ============================================ */
+
+.volume-area {
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    padding: 50px 50px 150px 50px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    align-items: stretch;
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.volume-area h2 {
+    text-align: left;
+    width: 100%;
+    color: white;
+    font-size: 27px;
+    font-weight: 600;
+    margin: 0 0 30px;
+    padding: 20px 50px 20px 30px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================ */
+/* 13. 定章页面样式                            */
+/* ============================================ */
+
+.chapter-area {
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    padding: 50px 50px 150px 50px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    align-items: stretch;
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.chapter-area h2 {
+    text-align: left;
+    width: 100%;
+    color: white;
+    font-size: 27px;
+    font-weight: 600;
+    margin: 0 0 30px;
+    padding: 20px 50px 20px 30px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================ */
+/* 14. 推演页面样式                            */
+/* ============================================ */
+
+.deduction-area {
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    padding: 50px 50px 150px 50px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    align-items: stretch;
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.deduction-area h2 {
+    text-align: left;
+    width: 100%;
+    color: white;
+    font-size: 27px;
+    font-weight: 600;
+    margin: 0 0 30px;
+    padding: 20px 50px 20px 30px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================ */
+/* 15. 成文页面样式                            */
+/* ============================================ */
+
+.content-area {
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    padding: 50px 50px 150px 50px;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    align-items: stretch;
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.content-area h2 {
+    text-align: left;
+    width: 100%;
+    color: white;
+    font-size: 27px;
+    font-weight: 600;
+    margin: 0 0 30px;
+    padding: 20px 50px 20px 30px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================ */
+/* 16. 动画与特�?                             */
+/* ============================================ */
+
+.action-panel {
+  position: absolute;
+  bottom: 12px;
+  right: 6px;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  z-index: 10;
+  height: 52px;
+}
+
+/* ===== 眼睛 loader (idle) ===== */
+.eye-loader {
+  position: relative;
+  width: 96px;
+  height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0.85;
+}
+.eye-loader::after,
+.eye-loader::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.7);
+  background-image: radial-gradient(
+    circle 14px,
+    #0d161b 100%,
+    transparent 0
+  );
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  animation: eyeMove 10s infinite, blink 10s infinite;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+@keyframes eyeMove {
+  0%,
+  10% {
+    background-position: 0 0;
+  }
+  13%,
+  40% {
+    background-position: -15px 0;
+  }
+  43%,
+  70% {
+    background-position: 15px 0;
+  }
+  73%,
+  90% {
+    background-position: 0 15px;
+  }
+  93%,
+  100% {
+    background-position: 0 0;
+  }
+}
+@keyframes blink {
+  0%,
+  10%,
+  12%,
+  20%,
+  22%,
+  40%,
+  42%,
+  60%,
+  62%,
+  70%,
+  72%,
+  90%,
+  92%,
+  98%,
+  100% {
+    height: 48px;
+  }
+  11%,
+  21%,
+  41%,
+  61%,
+  71%,
+  91%,
+  99% {
+    height: 18px;
+  }
+}
+
+@keyframes jelly-shake {
+    0%, 100% {
+        transform: scale(1);
+    }
+    20% {
+        transform: scale(0.95);
+    }
+    40% {
+        transform: scale(1.05);
+    }
+    60% {
+        transform: scale(0.98);
+    }
+    80% {
+        transform: scale(1.02);
+    }
+}
+
+label[for="charSwitch"]:hover {
+    color: white;
+    animation: jelly-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    background: linear-gradient(135deg, rgba(200, 180, 255, 0.5), rgba(255, 200, 230, 0.35));
+}
+
+label[for="timeSwitch"]:hover {
+    color: white;
+    animation: jelly-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    background: linear-gradient(135deg, rgba(160, 220, 255, 0.42), rgba(210, 245, 255, 0.28));
+}
+
+label[for="locSwitch"]:hover {
+    color: white;
+    animation: jelly-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    background: linear-gradient(135deg, rgba(180, 235, 200, 0.42), rgba(220, 250, 230, 0.28));
+}
+
+@keyframes link-label-shake {
+    0% {
+        transform: scale(1);
+    }
+    20% {
+        transform: scale(0.93);
+    }
+    40% {
+        transform: scale(1.07);
+    }
+    60% {
+        transform: scale(0.96);
+    }
+    80% {
+        transform: scale(1.04);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.link-label-shaking {
+    animation: link-label-shake 0.46s ease-in-out !important;
+    transform-box: fill-box;
+    transform-origin: center center;
+}
+
+@keyframes node-circle-shake {
+    0% {
+        r: 30px;
+    }
+    20% {
+        r: 28px;
+    }
+    40% {
+        r: 32px;
+    }
+    60% {
+        r: 29px;
+    }
+    80% {
+        r: 31px;
+    }
+    100% {
+        r: 30px;
+    }
+}
+
+.node-circle-shaking {
+    animation: node-circle-shake 0.46s ease-in-out !important;
+    will-change: r;
+    filter: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* ============================================ */
+/* 13. 力导向图样式                            */
+/* ============================================ */
+
+.canvas-container {
+    background: rgba(26, 26, 46, 0.6);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+    padding: 0;
+    min-height: 600px;
+    max-height: 600px;
+    height: 600px;
+    position: relative;
+    overflow: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.force-graph {
+    width: 100%;
+    height: 600px;
+    background: rgba(26, 26, 46, 0.6);
+    display: block;
+}
+
+.force-graph .node {
+    cursor: pointer;
+    transition: none !important;
+}
+
+.force-graph .node:hover circle {
+    stroke-width: 3px;
+    filter: drop-shadow(0 0 8px rgba(142, 45, 226, 0.6));
+    transition: filter 0.3s ease, stroke-width 0.3s ease;
+}
+
+.force-graph .node.selected circle {
+    stroke-width: 4px;
+    filter: drop-shadow(0 0 12px rgba(142, 45, 226, 0.8));
+}
+
+.force-graph .link {
+    stroke-width: 2;
+    transition: none !important;
+}
+
+.force-graph .link:hover {
+    stroke-width: 3;
+    transition: stroke 0.3s ease, stroke-width 0.3s ease;
+}
+
+.location-link {
+    stroke-width: 3;
+    stroke-opacity: 1;
+}
+
+.force-graph .node-label {
+    font-size: 13px;
+    font-weight: 500;
+    fill: rgba(255, 255, 255, 0.85);
+    pointer-events: none;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.force-graph .node-icon {
+    font-size: 18px;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.force-tooltip {
+    position: absolute;
+    min-width: 200px;
+    max-width: 500px;
+    background: rgba(26, 26, 46, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    word-break: break-word;
+    box-sizing: border-box;
+    line-height: 1.6;
+}
+
+.force-tooltip .tooltip-header {
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.force-tooltip .tooltip-name {
+    font-weight: 700;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.force-tooltip .tooltip-alias {
+    font-weight: 500;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-left: 8px;
+}
+
+.force-tooltip .tooltip-type-tag {
+    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+    font-weight: 600;
+    flex-shrink: 0;
+    background: rgba(168, 85, 247, 0.3);
+}
+
+.force-tooltip .tooltip-divider {
+    border: none;
+    border-top: 1px solid rgba(168, 85, 247, 0.2);
+    margin: 0 0 14px 0;
+}
+
+.force-tooltip .tooltip-item {
+    margin: 8px 0;
+    font-size: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.force-tooltip .tooltip-label {
+    font-weight: 700;
+    font-size: 16px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.force-tooltip .tooltip-value {
+    color: rgba(255, 255, 255, 0.85);
+    word-break: break-word;
+    flex: 1;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+#outlineCanvas {
+    width: 100%;
+    height: 500px;
+    border-radius: 12px;
+    background: rgba(26, 26, 46, 0.6);
+    cursor: crosshair;
+    display: block;
+}
+
+.canvas-tips {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    margin-top: 15px;
+    padding: 12px 16px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 8px;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.canvas-tips p {
+    margin: 0;
+}
+
+@keyframes node-location-shake {
+    0% {
+        transform: scale(1);
+    }
+    20% {
+        transform: scale(0.98);
+    }
+    40% {
+        transform: scale(1.02);
+    }
+    60% {
+        transform: scale(0.99);
+    }
+    80% {
+        transform: scale(1.005);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.node-location-shaking {
+    animation: node-location-shake 0.46s ease-in-out !important;
+    transform-origin: center center;
+}

@@ -24,7 +24,7 @@ class LLMCache(BaseCache):
         self._cache_hits = 0
         self._cache_misses = 0
         logger.info(
-            f"🔌 首次使用 {config.STORAGE_BACKEND} 缓存，连接信息: "
+            f"首次使用 {config.STORAGE_BACKEND} 缓存，连接信息: "
             f"local://{config.STORAGE_BACKEND}:{config.LLM_CACHE_MAX_SIZE}/{config.LLM_CACHE_TTL}, "
         )
 
@@ -98,10 +98,10 @@ class LLMCache(BaseCache):
     def stats(self) -> str:
         total = self._cache_hits + self._cache_misses
         if total == 0:
-            return "📊 LLM 缓存: 无调用"
+            return "LLM 缓存: 无调用"
         hit_rate = self._cache_hits / total
         return (
-            f"📊 LLM 缓存命中率: {hit_rate:.2%} | "
+            f"LLM 缓存命中率: {hit_rate:.2%} | "
             f"命中={self._cache_hits} | 未命中={self._cache_misses} | "
             f"当前大小={len(self.cache)} / {self.max_size}"
         )

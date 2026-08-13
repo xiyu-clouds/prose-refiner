@@ -37,6 +37,6 @@ class EmailNotifier(Notifier):
                 server.login(self.config[ke.KEY_EMAIL_USERNAME], self.config[ke.KEY_EMAIL_PASSWORD])
                 server.sendmail(self.config[ke.KEY_EMAIL_USERNAME], self.config[ke.KEY_EMAIL_TO], msg.as_string())
 
-            logger.info("📧 邮件发送成功", module_name=self.CHINESE_NAME)
+            logger.info("邮件发送成功", module_name=self.CHINESE_NAME)
         except Exception as e:
-            logger.error(f"❌ 邮件发送失败：{e}", module_name=self.CHINESE_NAME, exc_info=True)
+            logger.error(f"邮件发送失败：{e}", module_name=self.CHINESE_NAME, exc_info=True)

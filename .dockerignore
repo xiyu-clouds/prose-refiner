@@ -18,6 +18,7 @@ __pycache__/
 
 # 构建产物
 dist/*
+!dist/bin
 !dist/apt-packages
 !dist/packages
 !dist/npm-packages

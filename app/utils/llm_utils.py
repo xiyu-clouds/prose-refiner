@@ -8,7 +8,20 @@ from app.common import keys as ke
 from app.common import values as va
 from app.common.enums import ValidationRule
 from app.common.llm_constants import LLMVendor
+from app.config.config import config
 from app.utils.logger import LoggerManager as logger
+
+
+def resolve_max_tokens(char_count: int) -> int:
+    """基于输入文本长度动态计算 max_tokens 基准值。
+
+    计算公式：max(safe_min, char_count * FULL_TEXT_TOKENS_RATIO)
+    safe_min 为安全兜底，保证短文本也有足够空间容纳 DeepSeek 推理链。
+    """
+    base = int(char_count * config.FULL_TEXT_TOKENS_RATIO)
+    safe_min = 3072
+    return max(base, safe_min)
+
 
 
 def extract_json_safely(content: str) -> dict:
@@ -129,6 +142,20 @@ def create_langchain_model(vendor: str, params: Dict[str, Any]) -> BaseChatModel
     # 3. 参数映射
     params_map = meta.get(ke.KEY_PARAMS_MAP, {})
     final_params = map_params_to_vendor(params, params_map)
+
+    # 3.1 透传 base_url（厂商级端点，如通义 DashScope OpenAI 兼容端点）
+    base_url = meta.get(ke.KEY_BASE_URL)
+    if base_url:
+        final_params[ke.KEY_BASE_URL] = base_url
+
+    # 3.2 response_format 需要放入 model_kwargs，避免 LangChain 触发 UserWarning：
+    #     "response_format was transferred to model_kwargs. Please confirm that response_format is what you intended."
+    if ke.KEY_RESPONSE_FORMAT in final_params:
+        rf = final_params.pop(ke.KEY_RESPONSE_FORMAT)
+        if isinstance(final_params.get("model_kwargs"), dict):
+            final_params["model_kwargs"][ke.KEY_RESPONSE_FORMAT] = rf
+        else:
+            final_params["model_kwargs"] = {ke.KEY_RESPONSE_FORMAT: rf}
 
     # 4. 实例化
     logger.debug(f"实例化模型: {vendor}, 类: {model_class.__name__}, 映射参数: {final_params}",

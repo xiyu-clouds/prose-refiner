@@ -1,0 +1,179 @@
+<style>
+  #terminal-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.95);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(142, 45, 226, 0.3);
+  }
+
+  #terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(30, 41, 59, 0.8);
+    border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    z-index: 1;
+  }
+
+  #terminal-header .title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #terminal-header .title span:first-child {
+    font-size: 16px;
+  }
+
+  #terminal-header .title span:last-child {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  #terminal-header .actions {
+    position: absolute;
+    top: 12px;
+    right: 80px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  #terminal-header .actions button {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+    z-index: 20;
+  }
+
+  #terminal-header .actions button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+  }
+
+  #progressLog {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #94a3b8;
+    background: rgba(10, 15, 25, 0.8);
+  }
+
+  #progressLog::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #progressLog::-webkit-scrollbar-track {
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 4px;
+  }
+
+  #progressLog::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.6);
+    border-radius: 4px;
+  }
+
+  #progressLog::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.8);
+  }
+
+  #terminal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(30, 41, 59, 0.5);
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  #terminal-footer button {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  #terminal-footer button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+  }
+
+  .log-line {
+    margin: 3px 0;
+    word-break: break-all;
+    padding: 2px 0;
+  }
+
+  .log-line.info {
+    color: #94a3b8;
+  }
+
+  .log-line.message {
+    color: #a5f3fc;
+  }
+
+  .log-line.upload_progress {
+    color: #bbf7d0;
+  }
+
+  .log-line.task_progress {
+    color: #fde047;
+  }
+
+  .log-line.error {
+    color: #fca5a5;
+  }
+</style>
+
+<div id="terminal-container">
+  <div id="terminal-header">
+    <div class="title">
+      <span>🖥️</span>
+      <span>终端日志</span>
+    </div>
+    <div class="actions">
+      <button id="terminal-clear" title="清空日志">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+    </div>
+  </div>
+  <div id="progressLog">
+    <div style="color: #64748b;">正在连接 SSE 服务...</div>
+  </div>
+  <div id="terminal-footer">
+    <span>实时日志 • 自动滚动</span>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modalBox = document.querySelector('.modal-box');
+    if (modalBox && window.Terminal && !modalBox._terminalInitialized) {
+      modalBox._terminalInitialized = true;
+      window.Terminal = new window.Terminal(modalBox);
+    }
+  });
+</script>

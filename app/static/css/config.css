@@ -1,0 +1,354 @@
+:root {
+    --primary-color: #4a00e0;
+    --secondary-color: #8e2de2;
+    --bg-color: #f9f9f9;
+    --card-bg: #ffffff;
+    --text-color: #333;
+    --border-color: #e0e0e0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    position: relative;
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1280px;
+    width: 92%;
+    position: relative;
+    margin: 100px auto;
+}
+
+.header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 8px;
+}
+
+.header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: 15px 0 30px;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    top: 10px;
+    z-index: 999;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--primary-color);
+}
+
+.btn:hover {
+    background: #f0f0ff;
+}
+
+.config-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.config-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.config-header {
+    padding: 15px 20px;
+    background: #fafafa;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #444;
+}
+
+.config-header:hover {
+    background: #f0f0f0;
+}
+
+.config-body {
+    display: none;
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    background: #fff;
+}
+
+.config-body.open {
+    display: block;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px 20px;
+}
+
+.form-group.full-width { grid-column: 1 / -1; }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #555;
+    line-height: 1.5;
+}
+
+.form-group label .label-text {
+    font-weight: 500;
+}
+
+.form-group label .field-hint {
+    color: #868e96;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: Consolas, 'Monaco', monospace;
+    transition: border-color 0.2s;
+    color: #333;
+    box-sizing: border-box;
+}
+
+select.form-control {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+select.form-control option {
+    font-weight: 600;
+    font-family: Consolas, 'Monaco', monospace;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 0, 224, 0.1);
+}
+
+.status-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+    max-width: 400px;
+    min-width: 200px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+#minimized-hints,
+#task-notifications {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 4px;
+    max-width: 100%;
+}
+.minimized-hint-item {
+    background: rgba(30, 30, 30, 0.85);
+    color: #e0e0e0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+}
+.minimized-hint-item:hover {
+    background: rgba(50, 50, 50, 0.95);
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .container {
+        width: 95%;
+    }
+}
+
+/* =========================================================
+   密码/密钥字段：状态徽章 + 边框颜色 + 眼睛按钮
+   ========================================================= */
+.pwd-field-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pwd-field-wrap .form-control {
+    padding-right: 42px !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+/* 🔐 已保存真实密钥（掩码显示）绿色边框 + 浅绿底 */
+.pwd-field-wrap .form-control.pwd-saved {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.08);
+    background-color: #f3fff6;
+}
+
+/* ⚠️ 未设置：红色虚线边框 + 浅红底，提示赶紧填 */
+.pwd-field-wrap .form-control.pwd-empty {
+    border: 1px dashed #dc3545 !important;
+    background-color: #fff6f6;
+}
+.pwd-field-wrap .form-control.pwd-empty::placeholder {
+    color: #dc3545;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+/* ✏️ 编辑中：蓝色边框 */
+.pwd-field-wrap .form-control.pwd-modified {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.08);
+}
+
+/* 眼睛按钮 */
+.pwd-toggle-eye {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    height: 38px;
+    width: 30px;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    z-index: 2;
+    border-radius: 4px;
+}
+.pwd-toggle-eye:hover {
+    background: rgba(0,0,0,0.06);
+    color: #343a40;
+}
+
+/* 状态徽章 */
+.pwd-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    width: fit-content;
+    user-select: none;
+}
+.pwd-badge-saved {
+    background: #e7f8ec;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.pwd-badge-empty {
+    background: #ffe6e6;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.pwd-badge-modified {
+    background: #e2f3f7;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* 🔒 锁图标：掩码状态（已保存真实值，不显示/隐藏切换，避免 8 星/点号怪象） */
+.pwd-toggle-eye.pwd-eye-locked {
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    cursor: help;
+    font-size: 15px;
+    font-weight: 600;
+}
+.pwd-toggle-eye.pwd-eye-locked:hover {
+    background-color: rgba(40, 167, 69, 0.16) !important;
+    color: #1e7e34 !important;
+}
+
+/* ⚠️ 未设置：锁按钮保持占位（对齐布局）但隐藏不显眼 */
+.pwd-toggle-eye.pwd-eye-hidden {
+    opacity: 0.28;
+    pointer-events: none;
+    background-color: rgba(220, 53, 69, 0.06) !important;
+    color: #dc3545 !important;
+    cursor: default;
+}

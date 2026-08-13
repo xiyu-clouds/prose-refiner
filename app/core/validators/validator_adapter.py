@@ -1,4 +1,4 @@
-from typing import Dict, List, Callable, Any
+from typing import Dict, List, Callable
 from .validator import UniversalDataValidator
 from ...common.enums import ValidationRule
 from ...utils.llm_utils import build_monitored_config_from_rules
@@ -47,44 +47,25 @@ def build_pre_process_callback(rules: List[ValidationRule]) -> Callable[[Dict], 
     return lambda data: _recursive_clean(data, "")
 
 
-def validate_step_rules(data: Dict, step_id: str) -> Dict:
-    rules: List[ValidationRule] = en.VAL_STEP_CHECK_RULES.get(step_id, [])
+def validate_capability_output(parsed: Dict, prompt_id: str) -> Dict:
+    parts = prompt_id.split("::", 1)
+    capability_id = parts[1] if len(parts) >= 2 else ""
+
+    rules: List[ValidationRule] = en.VAL_STEP_CHECK_RULES.get(capability_id, [])
     if not rules:
         return {
             ke.KEY_IS_VALID: True,
             ke.KEY_ERRORS: [],
-            ke.KEY_CLEANED_DATA: data
+            ke.KEY_CLEANED_DATA: parsed
         }
 
     dynamic_config = build_monitored_config_from_rules(rules)
-
     pre_callback = build_pre_process_callback(rules)
 
     return validator.validate(
-        data=data,
+        data=parsed,
         rules=rules,
         monitored_fields_config=dynamic_config,
         pre_process_callback=pre_callback,
-        post_process_callback=None
-    )
-
-
-def validate_metacognition_rules(data: Dict[str, Any], plugin_id: str) -> Dict[str, Any]:
-    rules: List[ValidationRule] = en.VAL_METACOGNITION_CHECK_RULES.get(plugin_id, [])
-
-    if not rules:
-        return {
-            ke.KEY_IS_VALID: True,
-            ke.KEY_ERRORS: [],
-            ke.KEY_CLEANED_DATA: data
-        }
-
-    dynamic_config = build_monitored_config_from_rules(rules)
-
-    return validator.validate(
-        data=data,
-        rules=rules,
-        monitored_fields_config=dynamic_config,
-        pre_process_callback=None,
         post_process_callback=None
     )

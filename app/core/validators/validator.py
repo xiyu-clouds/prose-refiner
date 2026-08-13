@@ -580,10 +580,10 @@ class UniversalDataValidator:
         # cleaned_data = self.remove_nulls(data)
 
         if monitored_fields_config:
-            logger.debug(f"🔍 [通用解包] 开始扫描 (监控字段: {list(monitored_fields_config.keys())})", module_name=self.CHINESE_NAME)
+            logger.debug(f"[通用解包] 开始扫描 (监控字段: {list(monitored_fields_config.keys())})", module_name=self.CHINESE_NAME)
             # 调用内置的递归修复函数
             self._recursive_smart_fix_internal(data, monitored_fields_config)
-            logger.debug("🔍 [通用解包] 扫描完成。", module_name=self.CHINESE_NAME)
+            logger.debug("[通用解包] 扫描完成。", module_name=self.CHINESE_NAME)
 
         # 前置处理 (清洗引号等)
         if pre_process_callback:

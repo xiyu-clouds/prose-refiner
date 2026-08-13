@@ -16,3 +16,8 @@ build.bat
 build.ps1
 requirements-build.txt
 requirements-runtime.txt
+*.db-wal
+*.db-shm
+Dockerfile
+.dockerignore
+docker-compose.yml
