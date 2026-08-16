@@ -1624,7 +1624,7 @@ function showUnsplashImage() {
       }
       // 清理快照
       const state = unsplashApi.getState();
-      localStorage.setItem('__unsplash_state__', JSON.stringify(state));
+      localStorage.setItem(`__unsplash_state__${taskId}`, JSON.stringify(state));
     }
   });
   modal.overlay.dataset.taskId = taskId;
@@ -2335,7 +2335,7 @@ function showPexelesImage() {
       }
       // 清理快照
       const state = pexelesApi.getState();
-      localStorage.setItem('__pexels_state__', JSON.stringify(state));
+      localStorage.setItem(`__pexels_state__${taskId}`, JSON.stringify(state));
     }
   });
   modal.overlay.dataset.taskId = taskId;
@@ -2386,7 +2386,7 @@ function initPexelsSearch(container, restoredState = null) {
   // ======================
   const dom = {
     mainContent: container.querySelector('.main-content'),
-    imageGrid: document.getElementById('imageGrid'),
+    imageGrid: container.querySelector('#imageGrid'),
     emptyState: container.querySelector('.empty-state'),
     paginationControls: container.querySelector('.pagination-controls'),
     searchInput: container.querySelector('.main-search-input'),
@@ -3492,7 +3492,6 @@ function renderPersistedMinimizedTasks() {
 
       if (task.modalOptions.url.includes('/unsplash-image.html')) {
         optionsToUse.onLoad = (modalBox) => {
-          // 从 localStorage 读取快照
           const stateStr = localStorage.getItem(`__unsplash_state__${task.id}`);
           let restoredState = null;
           if (stateStr) {
@@ -3502,14 +3501,39 @@ function renderPersistedMinimizedTasks() {
               console.warn('unsplash状态解析失败', e);
             }
           }
-          // 👇 传给 initMusicPlayer
-          initUnsplashSearch(modalBox, restoredState);
-        }
+          function initializeUnsplash() {
+            if (!modalBox.querySelector('[data-unsplash-init]')) {
+              setTimeout(() => { unsplashApi = initUnsplashSearch(modalBox, restoredState); }, 0);
+            } else {
+              unsplashApi = initUnsplashSearch(modalBox, restoredState);
+            }
+          }
+          if (typeof window.axios === 'function') {
+            initializeUnsplash();
+          } else {
+            const script = document.createElement('script');
+            script.src = '/static/js/vendors/axios.min.js';
+            script.onload = initializeUnsplash;
+            script.onerror = () => {
+              window.showError('加载网络库失败，请检查网络或刷新页面', container);
+            };
+            document.head.appendChild(script);
+          }
+        };
+        optionsToUse.onUnload = () => {
+          if (unsplashApi && typeof unsplashApi.cleanup === 'function') {
+            unsplashApi.cleanup();
+          }
+          const state = unsplashApi && typeof unsplashApi.getState === 'function'
+            ? unsplashApi.getState() : null;
+          if (state) {
+            localStorage.setItem(`__unsplash_state__${task.id}`, JSON.stringify(state));
+          }
+        };
       }
 
       if (task.modalOptions.url.includes('/pexels-image.html')) {
         optionsToUse.onLoad = (modalBox) => {
-          // 从 localStorage 读取快照
           const stateStr = localStorage.getItem(`__pexels_state__${task.id}`);
           let restoredState = null;
           if (stateStr) {
@@ -3519,9 +3543,35 @@ function renderPersistedMinimizedTasks() {
               console.warn('pexels状态解析失败', e);
             }
           }
-          // 👇 传给 initMusicPlayer
-          initUnsplashSearch(modalBox, restoredState);
-        }
+          function initializePexels() {
+            if (!modalBox.querySelector('[data-pexeles-init]')) {
+              setTimeout(() => { pexelesApi = initPexelsSearch(modalBox, restoredState); }, 0);
+            } else {
+              pexelesApi = initPexelsSearch(modalBox, restoredState);
+            }
+          }
+          if (typeof window.axios === 'function') {
+            initializePexels();
+          } else {
+            const script = document.createElement('script');
+            script.src = '/static/js/vendors/axios.min.js';
+            script.onload = initializePexels;
+            script.onerror = () => {
+              window.showError('加载网络库失败，请检查网络或刷新页面', container);
+            };
+            document.head.appendChild(script);
+          }
+        };
+        optionsToUse.onUnload = () => {
+          if (pexelesApi && typeof pexelesApi.cleanup === 'function') {
+            pexelesApi.cleanup();
+          }
+          const state = pexelesApi && typeof pexelesApi.getState === 'function'
+            ? pexelesApi.getState() : null;
+          if (state) {
+            localStorage.setItem(`__pexels_state__${task.id}`, JSON.stringify(state));
+          }
+        };
       }
 
       const modal = showModal(optionsToUse);
